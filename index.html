@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pau Pelus Beauty - App Completa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #ffe6f0 0%, #ffd2e6 100%); min-height: 100vh; padding: 15px; }
+        .container { max-width: 1800px; margin: 0 auto; }
+        header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(214,89,140,0.12); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .logo-img { height: 52px; width: auto; display: block; }
+        h1 { color: #d6598c; margin: 0; }
+        .subtitle { color: #e58cac; font-size: 12px; font-weight: 600; }
+        nav { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
+        nav button { padding: 10px 15px; background: #f4a9c4; color: #7a3a56; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        nav button:hover { background: #ef8fb2; color: white; transform: translateY(-2px); }
+        nav button.active { background: #ef8fb2; color: white; box-shadow: 0 0 0 2px white, 0 0 0 4px #f4a9c4; }
+        .content { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(214,89,140,0.12); }
+        .section { display: none; }
+        .section.active { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: #fff5f9; border-left: 5px solid #f4a9c4; color: #4a4a4a; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 12px; text-transform: uppercase; color: #d6598c; opacity: 1; margin-bottom: 10px; }
+        .card .value { font-size: 32px; font-weight: bold; color: #333; }
+        .card .label { font-size: 11px; color: #999; margin-top: 5px; }
+        form { background: #fdf5f8; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { position: relative; }
+        .form-group label { display: block; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 13px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #eecfdc; border-radius: 6px; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #f4a9c4; box-shadow: 0 0 0 3px rgba(244,169,196,0.25); }
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #f4a9c4; border-top: none; border-radius: 0 0 8px 8px; max-height: 220px; overflow-y: auto; z-index: 50; box-shadow: 0 6px 14px rgba(0,0,0,0.12); display: none; }
+        .autocomplete-item { padding: 9px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f8eef3; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item.activa { background: #fdf0f5; }
+        .autocomplete-item .ac-nombre { color: #999; margin-left: 6px; }
+        .btn { padding: 12px 25px; background: #ef8fb2; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn:hover { background: #e8759f; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(232,117,159,0.35); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        table thead { background: #fdf0f5; }
+        table th { padding: 12px; text-align: left; font-weight: 600; color: #7a3a56; border-bottom: 2px solid #f4a9c4; }
+        table td { padding: 12px; border-bottom: 1px solid #f5eaef; }
+        table tr:hover { background: #fef8fb; }
+        tr.fila-filtros th { padding: 6px 8px; border-bottom: 1px solid #f4a9c4; }
+        tr.fila-filtros:hover { background: #fdf0f5; }
+        .filtro-col { width: 100%; padding: 5px 7px; border: 1px solid #eecfdc; border-radius: 4px; font-family: inherit; font-size: 12px; background: white; }
+        .filtro-col:focus { outline: none; border-color: #f4a9c4; box-shadow: 0 0 0 2px rgba(244,169,196,0.25); }
+        .sin-resultados-filtro td { text-align: center; color: #999; padding: 18px; }
+        .modal-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 900; align-items: center; justify-content: center; padding: 15px; }
+        .modal-fondo.abierto { display: flex; }
+        .modal-caja { background: white; border-radius: 12px; padding: 25px; width: 100%; max-width: 460px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .modal-caja h3 { color: #d6598c; margin-bottom: 5px; }
+        .modal-resumen { background: #fdf0f5; border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 13px; line-height: 1.7; }
+        .modal-acciones { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-small { padding: 6px 12px; font-size: 12px; background: #ef8fb2; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .btn-small:hover { background: #e8759f; }
+        .chart-filtro-btn { background: #f4a9c4; padding: 8px 16px; }
+        .chart-filtro-btn.active { background: #e8759f; box-shadow: 0 0 0 2px #f4a9c4; }
+        .btn-delete { background: #e79999; }
+        .btn-delete:hover { background: #d97a7a; }
+        .search-box { margin-bottom: 15px; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 10px; border: 1px solid #eecfdc; border-radius: 6px; }
+        .alert { padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-info { background: #fdf0f5; color: #7a3a56; border: 1px solid #f4a9c4; }
+        h2 { color: #444; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f4a9c4; }
+        h3 { color: #666; margin: 20px 0 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #a8577e; font-size: 12px; margin-top: 30px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f5eaef; }
+        .tab-btn { padding: 10px 20px; background: transparent; color: #666; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { color: #d6598c; border-bottom-color: #ef8fb2; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        @media (max-width: 768px) {
+            nav { margin-left: 0; }
+            header { flex-direction: column; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="pantalla-login" style="min-height:100vh; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #ffe6f0 0%, #ffd2e6 100%); position:fixed; inset:0; z-index:1000;">
+        <div style="background:white; padding:40px; border-radius:12px; box-shadow:0 4px 20px rgba(214,89,140,0.2); width:100%; max-width:360px;">
+            <h2 style="color:#d6598c; margin-bottom:5px; text-align:center;">💖 Pau Pelus Beauty</h2>
+            <p style="color:#888; font-size:13px; text-align:center; margin-bottom:25px;">Inicia sesión para continuar</p>
+            <form id="form-login" onsubmit="return iniciarSesion(event)">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label>Correo</label>
+                    <input type="email" id="login-email" required style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-password" required style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                </div>
+                <div id="login-error" style="color:#c0575c; font-size:13px; margin-bottom:10px; display:none;"></div>
+                <button type="submit" class="btn" id="login-submit-btn" style="width:100%;">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <datalist id="lista-proveedores"></datalist>
+    <datalist id="lista-empresas"></datalist>
+    <div class="container" id="app-container" style="display:none;">
+        <header>
+            <img src="data:image/png;base64,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" alt="Paupelus Beauty" class="logo-img">
+            <div>
+                <h1>PAUPELUS BEAUTY</h1>
+                <div class="subtitle">Plataforma Completa de Gestión</div>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-section="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-section="productos">📦 Productos</button>
+                <button class="nav-btn" data-section="compras">🛒 Compras</button>
+                <button class="nav-btn" data-section="ventas">💰 Ventas</button>
+                <button class="nav-btn" data-section="entregas">🚚 Entregas</button>
+                <button class="nav-btn" data-section="inventario">📋 Inventario</button>
+                <button class="nav-btn" data-section="reportes">📈 Reportes</button>
+                <button class="nav-btn" data-section="datos">💾 Datos</button>
+                <button type="button" onclick="cerrarSesion()" style="background:#e8b4c8; color:#7a3a56; border:none; border-radius:6px; padding:10px 15px; cursor:pointer; font-weight:600;">🚪 Salir</button>
+            </nav>
+        </header>
+
+        <div class="content">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <h2>📊 Dashboard Principal</h2>
+
+                <h3 style="margin-top: 0;">📈 Ventas por Semana (comparado con el período anterior)</h3>
+                <div class="form-row" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-small chart-filtro-btn active" id="chart-btn-1" onclick="dibujarGraficoVentas(1)">Último Mes</button>
+                    <button type="button" class="btn-small chart-filtro-btn" id="chart-btn-3" onclick="dibujarGraficoVentas(3)">Últimos 3 Meses</button>
+                    <button type="button" class="btn-small chart-filtro-btn" id="chart-btn-6" onclick="dibujarGraficoVentas(6)">Últimos 6 Meses</button>
+                </div>
+                <div style="background: #fff; border: 1px solid #f5eaef; border-radius: 8px; padding: 10px; margin-bottom: 30px;">
+                    <canvas id="dash-chart"></canvas>
+                </div>
+
+                <h3>Resumen del Mes Actual</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Comprado</h3>
+                        <div class="value" id="dash-compras">$0</div>
+                        <div class="label" id="dash-cant-compras">0 unidades</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Vendido</h3>
+                        <div class="value" id="dash-ventas">$0</div>
+                        <div class="label" id="dash-cant-ventas">0 unidades</div>
+                    </div>
+                    <div class="card">
+                        <h3>Utilidad</h3>
+                        <div class="value" id="dash-ganancia">$0</div>
+                        <div class="label" id="dash-margen">0%</div>
+                    </div>
+                    <div class="card">
+                        <h3>Stock del Mes</h3>
+                        <div class="value" id="dash-stock">0</div>
+                        <div class="label">unidades (comprado - vendido)</div>
+                    </div>
+                    <div class="card">
+                        <h3>Dinero en Tránsito</h3>
+                        <div class="value" id="dash-transito">$0</div>
+                        <div class="label">Por cobrar</div>
+                    </div>
+                    <div class="card">
+                        <h3>Productos</h3>
+                        <div class="value" id="dash-productos">0</div>
+                        <div class="label">en catálogo</div>
+                    </div>
+                </div>
+
+                <h3>Últimas Operaciones</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dash-ultimas">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <div id="productos" class="section">
+                <h2>📦 Codificación de Productos (Pelucas)</h2>
+                <form onsubmit="agregarProducto(event)">
+                    <input type="hidden" id="prod-edit-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Referencia/No. Parte *</label>
+                            <input type="text" id="prod-ref" required placeholder="Ej: LC8008-1">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre de la Peluca *</label>
+                            <input type="text" id="prod-nombre" required placeholder="Ej: Keyla, Ruby">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" id="prod-color" placeholder="Ej: Rubio Medio">
+                        </div>
+                        <div class="form-group">
+                            <label>Longitud</label>
+                            <input type="text" id="prod-long" placeholder="Ej: Largo">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <input type="text" id="prod-tipo" placeholder="Ej: Ondulado, Liso">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Precio Base Venta (Pesos) *</label>
+                            <input type="number" id="prod-precio" required placeholder="160000" step="1000">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn" id="prod-submit-btn">➕ Agregar Producto</button>
+                    <button type="button" class="btn" id="prod-cancel-btn" style="display:none; background:#aaa;" onclick="cancelarEdicionProducto()">✖️ Cancelar</button>
+                </form>
+
+                <div class="search-box">
+                    <input type="text" id="search-prod" placeholder="Buscar producto...">
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Nombre</th>
+                            <th>Color</th>
+                            <th>Longitud</th>
+                            <th>Tipo</th>
+                            <th>Precio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- COMPRAS -->
+            <div id="compras" class="section">
+                <h2>🛒 Registro de Compras</h2>
+                <form onsubmit="agregarCompra(event)">
+                    <input type="hidden" id="comp-edit-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha *</label>
+                            <input type="date" id="comp-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Proveedor *</label>
+                            <input type="text" id="comp-prov" required placeholder="Escribe el nombre del proveedor" list="lista-proveedores" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Referencia/Producto *</label>
+                            <input type="text" id="comp-ref" required placeholder="Escribe la referencia o el nombre..." autocomplete="off">
+                            <div class="autocomplete-list" id="comp-ref-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad *</label>
+                            <input type="number" id="comp-cant" required placeholder="0" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Costo Unitario (Pesos) *</label>
+                            <input type="number" id="comp-costo" required placeholder="0" step="100">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn" id="comp-submit-btn">➕ Registrar Compra</button>
+                    <button type="button" class="btn" id="comp-cancel-btn" style="display:none; background:#aaa;" onclick="cancelarEdicionCompra()">✖️ Cancelar</button>
+                </form>
+
+                <div class="search-box">
+                    <input type="text" id="search-comp" placeholder="Buscar compra...">
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Proveedor</th>
+                            <th>Nombre de la Peluca</th>
+                            <th>Referencia</th>
+                            <th>Cantidad</th>
+                            <th>Costo Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-compras">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- VENTAS -->
+            <div id="ventas" class="section">
+                <h2>💰 Registro de Ventas</h2>
+                <input type="hidden" id="vent-edit-id" value="">
+
+                <h3 style="margin-top:0;">1. Agrega los productos de esta venta</h3>
+                <form onsubmit="return false;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Referencia/Producto</label>
+                            <input type="text" id="item-ref" placeholder="Escribe la referencia o el nombre..." autocomplete="off" onblur="sugerirCostoItem()">
+                            <div class="autocomplete-list" id="item-ref-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" id="item-cant" placeholder="1" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Unitario (Pesos)</label>
+                            <input type="number" id="item-precio" placeholder="160000" step="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>Costo Unitario (Pesos)</label>
+                            <input type="number" id="item-costo" placeholder="Se sugiere automático" step="100">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn" onclick="agregarItemCarrito()" style="width: 100%;">➕ Agregar Producto</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Costo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-carrito">
+                        <tr><td colspan="7" style="text-align: center; color: #999;">Sin productos agregados aún</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background: #fdf0f5;">
+                            <td colspan="4">TOTAL DE LA VENTA</td>
+                            <td id="carrito-total">$0</td>
+                            <td id="carrito-costo">$0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <h3>2. Datos del cliente y envío</h3>
+                <form onsubmit="agregarVenta(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha *</label>
+                            <input type="date" id="vent-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <input type="text" id="vent-cliente" placeholder="Escribe el nombre..." autocomplete="off">
+                            <div class="autocomplete-list" id="vent-cliente-list"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <div style="position:relative;">
+                                <input type="text" id="vent-ciudad" placeholder="Bogotá, Cali, etc" autocomplete="off" onblur="sugerirAbono()">
+                                <div class="autocomplete-list" id="vent-ciudad-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Costo de Envío de la Venta (Pesos)</label>
+                            <input type="number" id="vent-envio" placeholder="0" step="500">
+                        </div>
+                        <div class="form-group">
+                            <label>Abono Recibido (Pesos)</label>
+                            <input type="number" id="vent-abono" placeholder="0" step="1000" oninput="actualizarSaldoVenta()">
+                        </div>
+                        <div class="form-group">
+                            <label>Saldo por Cobrar</label>
+                            <div id="vent-saldo-display" style="padding: 10px 0; font-weight: 700; font-size: 18px; color: #c0575c;">$0</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn" id="vent-submit-btn">✅ Registrar Venta Completa</button>
+                    <button type="button" class="btn" id="vent-cancel-btn" style="display:none; background:#aaa;" onclick="cancelarEdicionVenta()">✖️ Cancelar</button>
+                </form>
+
+                <h3>3. Listas de Seguimiento</h3>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="cambiarTab(event, 'vtab-envios')">📦 Envíos Pendientes</button>
+                    <button class="tab-btn" onclick="cambiarTab(event, 'vtab-cobro')">💳 Pendiente de Cobro</button>
+                    <button class="tab-btn" onclick="cambiarTab(event, 'vtab-historial')">🗂️ Historial Completo</button>
+                </div>
+
+                <div id="vtab-envios" class="tab-content active">
+                    <p style="color:#888; margin-bottom:15px; font-size:13px;">Ventas cuyo envío todavía no tiene número de guía real asignado.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ventas-envios"></tbody>
+                    </table>
+                </div>
+
+                <div id="vtab-cobro" class="tab-content">
+                    <p style="color:#888; margin-bottom:15px; font-size:13px;">Ventas con saldo pendiente por cobrar.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ventas-cobro"></tbody>
+                    </table>
+                </div>
+
+                <div id="vtab-historial" class="tab-content">
+                    <div class="search-box">
+                        <input type="text" id="search-vent" placeholder="Buscar venta...">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Fecha</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Costo</th>
+                                <th>Envío</th>
+                                <th>Utilidad</th>
+                                <th>Cliente</th>
+                                <th>Ciudad</th>
+                                <th>Abono</th>
+                                <th>Saldo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ventas">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ENTREGAS -->
+            <div id="entregas" class="section">
+                <h2>🚚 Control de Entregas y Dinero</h2>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>Dinero Recibido</h3>
+                        <div class="value" id="ent-recibido">$0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Dinero en Tránsito</h3>
+                        <div class="value" id="ent-transito">$0</div>
+                        <div class="label">Por cobrar</div>
+                    </div>
+                    <div class="card">
+                        <h3>Dinero Vencido (&gt;30d)</h3>
+                        <div class="value" id="ent-vencido">$0</div>
+                        <div class="label">URGENTE</div>
+                    </div>
+                </div>
+
+                <p style="color:#888; font-size:13px; margin-bottom:15px;">
+                    Cada fila es un envío. Usa <strong>💵 Registrar pago</strong> cuando recibas dinero de esa venta,
+                    y <strong>🏷️ Guía</strong> para anotar el número de guía que te da la transportadora.
+                </p>
+
+                <div class="search-box">
+                    <input type="text" id="search-ent" placeholder="Buscar envío...">
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Guía</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Abono Pagado</th>
+                            <th>Saldo Pendiente</th>
+                            <th>Empresa</th>
+                            <th>Estado</th>
+                            <th>Días</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-entregas">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- INVENTARIO -->
+            <div id="inventario" class="section">
+                <h2>📋 Inventario Actual</h2>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>Valor Total del Inventario</h3>
+                        <div class="value" id="inv-valor-total">$0</div>
+                        <div class="label">al costo (FIFO)</div>
+                    </div>
+                    <div class="card">
+                        <h3>Unidades en Stock</h3>
+                        <div class="value" id="inv-unidades">0</div>
+                        <div class="label">disponibles</div>
+                    </div>
+                    <div class="card">
+                        <h3>Referencias con Stock</h3>
+                        <div class="value" id="inv-refs">0</div>
+                        <div class="label" id="inv-refs-label">de 0 en catálogo</div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-small" onclick="APP.actualizarInventario(false)" id="inv-btn-con">📦 Solo con stock</button>
+                    <button type="button" class="btn-small" onclick="APP.actualizarInventario(true)" id="inv-btn-todos">📋 Ver todas las referencias</button>
+                    <button type="button" class="btn" onclick="exportarInventarioCSV()">⬇️ Exportar CSV</button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="search-inv" placeholder="Buscar referencia o nombre...">
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Nombre</th>
+                            <th>Costo Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inventario"></tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background: #fdf0f5;">
+                            <td colspan="3">TOTAL INVENTARIO</td>
+                            <td id="inv-foot-cant">0</td>
+                            <td id="inv-foot-valor">$0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- REPORTES -->
+            <div id="reportes" class="section">
+                <h2>📈 Reportes y Análisis</h2>
+
+                <h3>🗓️ Reporte de Ventas por Fechas (Semanal / Quincenal)</h3>
+                <form onsubmit="return false;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Desde</label>
+                            <input type="date" id="rep-desde">
+                        </div>
+                        <div class="form-group">
+                            <label>Hasta</label>
+                            <input type="date" id="rep-hasta">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="button" class="btn-small" onclick="rangoRapido(7)">📅 Última Semana</button>
+                        <button type="button" class="btn-small" onclick="rangoRapido(15)">📅 Última Quincena</button>
+                        <button type="button" class="btn" onclick="generarReporteFechas()">📊 Generar Reporte</button>
+                        <button type="button" class="btn" style="background:#8fb996;" onclick="exportarReporteCSV()">⬇️ Exportar CSV</button>
+                    </div>
+                </form>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Venta</th>
+                            <th>Fecha</th>
+                            <th>Referencia</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Costo</th>
+                            <th>Venta</th>
+                            <th>Costo Envío</th>
+                            <th>Utilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-reporte-fechas">
+                        <tr><td colspan="9" style="text-align: center; color: #999;">Selecciona un rango de fechas y genera el reporte</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background: #fdf0f5;">
+                            <td colspan="4">TOTALES</td>
+                            <td id="rep-fechas-cant">0</td>
+                            <td id="rep-fechas-costo">$0</td>
+                            <td id="rep-fechas-venta">$0</td>
+                            <td id="rep-fechas-envio">$0</td>
+                            <td id="rep-fechas-utilidad">$0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <h3 style="margin-top: 40px;">Resumen General</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Invertido</h3>
+                        <div class="value" id="rep-compras">$0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Ingresos</h3>
+                        <div class="value" id="rep-ventas">$0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Ganancia Neta</h3>
+                        <div class="value" id="rep-ganancia">$0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Margen %</h3>
+                        <div class="value" id="rep-margen">0%</div>
+                    </div>
+                </div>
+
+                <h3>Top 10 Productos Más Vendidos</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th>Nombre</th>
+                            <th>Cantidad Vendida</th>
+                            <th>Ingresos</th>
+                            <th>Ganancia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-top">
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 30px;">Dinero por Empresa de Logística</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>Enviado</th>
+                            <th>Recibido</th>
+                            <th>Pendiente</th>
+                            <th>% Cobrado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-empresas">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DATOS -->
+            <div id="datos" class="section">
+                <h2>💾 Gestión de Datos</h2>
+
+                <div class="alert alert-info">
+                    <strong>Estado del Sistema:</strong> <span id="datos-estado"></span>
+                </div>
+
+                <h3>📥 Importar Datos desde Excel (JSON)</h3>
+                <form onsubmit="return false;">
+                    <div class="form-group">
+                        <label>Selecciona el archivo paupelus_datos_completo.json</label>
+                        <input type="file" id="datos-input-file" accept=".json">
+                    </div>
+                    <button class="btn" onclick="importarDatosExcel()">📥 Importar Datos del Excel</button>
+                </form>
+
+                <h3>📤 Exportar / Respaldar</h3>
+                <button class="btn" onclick="exportarJSON()">⬇️ Descargar Respaldo (JSON)</button>
+
+                <h3 style="color:#c0392b;">⚠️ Zona de Peligro</h3>
+                <button class="btn btn-delete" onclick="limpiarTodo()">🗑️ Borrar Todos los Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-fondo" id="modal-pago">
+        <div class="modal-caja">
+            <h3>💵 Registrar Pago</h3>
+            <p style="color:#888; font-size:13px;">Anota el dinero que recibiste de este envío.</p>
+            <div class="modal-resumen" id="modal-pago-resumen"></div>
+            <form onsubmit="return guardarPagoModal(event)">
+                <input type="hidden" id="modal-pago-entrega-id">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label>Monto recibido *</label>
+                    <input type="number" id="modal-pago-monto" required placeholder="0" step="1000" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                    <div style="margin-top:8px;">
+                        <button type="button" class="btn-small" onclick="ponerSaldoCompleto()">Pagó todo el saldo</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>¿Quién paga? *</label>
+                        <select id="modal-pago-quien" required style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                            <option value="Cliente">Cliente</option>
+                            <option value="Empresa Logística">Empresa Logística</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha del pago</label>
+                        <input type="date" id="modal-pago-fecha" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                    </div>
+                </div>
+                <div class="modal-acciones">
+                    <button type="submit" class="btn" style="flex:1;">💾 Guardar pago</button>
+                    <button type="button" class="btn" style="background:#aaa;" onclick="cerrarModal('modal-pago')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-fondo" id="modal-guia">
+        <div class="modal-caja">
+            <h3>🏷️ Número de Guía</h3>
+            <p style="color:#888; font-size:13px;">Anota la guía que te da la transportadora para hacerle seguimiento al envío.</p>
+            <div class="modal-resumen" id="modal-guia-resumen"></div>
+            <form onsubmit="return guardarGuiaModal(event)">
+                <input type="hidden" id="modal-guia-entrega-id">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label>Número de guía</label>
+                    <input type="text" id="modal-guia-numero" placeholder="Ej: 700167116564" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label>Empresa de logística</label>
+                    <input type="text" id="modal-guia-empresa" placeholder="Interrapidísimo, Envía, Coordinadora..." list="lista-empresas" autocomplete="off" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                </div>
+                <div class="modal-acciones">
+                    <button type="submit" class="btn" style="flex:1;">💾 Guardar guía</button>
+                    <button type="button" class="btn" style="background:#aaa;" onclick="cerrarModal('modal-guia')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Pau Pelus Beauty © 2025 | Plataforma Completa de Gestión | v2.0</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+// ===== CONEXIÓN Y LOGIN CON SUPABASE =====
+// La "anon/publishable key" es pública por diseño (segura de exponer en el
+// navegador) -- la seguridad real la dan las políticas RLS configuradas en
+// supabase_schema.sql, no que esta clave sea secreta.
+const SUPABASE_URL = 'https://cfukejzjifyfiejfwhsj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_GNh6stUKtkoy9BUa6NAoHg_nFxYcu8J';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let appIniciada = false;
+
+async function mostrarApp() {
+    document.getElementById('pantalla-login').style.display = 'none';
+    document.getElementById('app-container').style.display = 'block';
+    if(!appIniciada) {
+        appIniciada = true;
+        await APP.init();
+    }
+}
+
+async function iniciarSesion(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+    const btn = document.getElementById('login-submit-btn');
+    errorEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+    if(error) {
+        errorEl.textContent = 'Correo o contraseña incorrectos.';
+        errorEl.style.display = 'block';
+        return false;
+    }
+    mostrarApp();
+    return false;
+}
+
+async function cerrarSesion() {
+    if(!confirm('¿Cerrar sesión?')) return;
+    await supabaseClient.auth.signOut();
+    location.reload();
+}
+
+async function verificarSesionInicial() {
+    const { data } = await supabaseClient.auth.getSession();
+    if(data && data.session) mostrarApp();
+}
+
+document.addEventListener('DOMContentLoaded', verificarSesionInicial);
+    </script>
+
+    <script>
+const APP = {
+    datos: {
+        productos: [],
+        clientes: [],
+        compras: [],
+        ventas: [],
+        entregas: []
+    },
+
+    async init() {
+        const ok = await this.cargarDatos();
+        if(!ok) return;
+        this.conectarEventos();
+        this.actualizarTodo();
+        if(typeof actualizarEstadoDatos === 'function') actualizarEstadoDatos();
+    },
+
+    // Trae las 6 tablas de Supabase y las arma en la misma forma en memoria
+    // que usa el resto de la app (items[] agrupados por venta, pagos[]
+    // agrupados por entrega, "cliente_nombre" -> "cliente" para no tener
+    // que tocar cada función de renderizado existente).
+    async cargarDatos() {
+        try {
+            const [rProd, rCli, rComp, rVent, rItems, rEnt, rPag] = await Promise.all([
+                supabaseClient.from('productos').select('*').order('ref'),
+                supabaseClient.from('clientes').select('*').order('nombre'),
+                supabaseClient.from('compras').select('*').order('fecha'),
+                supabaseClient.from('ventas').select('*').order('numero'),
+                supabaseClient.from('venta_items').select('*'),
+                supabaseClient.from('entregas').select('*'),
+                supabaseClient.from('pagos').select('*'),
+            ]);
+            const error = rProd.error || rCli.error || rComp.error || rVent.error || rItems.error || rEnt.error || rPag.error;
+            if(error) throw error;
+
+            const itemsPorVenta = {};
+            (rItems.data || []).forEach(it => {
+                (itemsPorVenta[it.venta_id] = itemsPorVenta[it.venta_id] || []).push(it);
+            });
+            const pagosPorEntrega = {};
+            (rPag.data || []).forEach(p => {
+                (pagosPorEntrega[p.entrega_id] = pagosPorEntrega[p.entrega_id] || []).push(p);
+            });
+
+            this.datos.productos = rProd.data || [];
+            this.datos.clientes = rCli.data || [];
+            this.datos.compras = rComp.data || [];
+            this.datos.ventas = (rVent.data || []).map(v => ({
+                ...v, cliente: v.cliente_nombre, items: itemsPorVenta[v.id] || []
+            }));
+            this.datos.entregas = (rEnt.data || []).map(e => ({
+                ...e, cliente: e.cliente_nombre, pagos: pagosPorEntrega[e.id] || []
+            }));
+            return true;
+        } catch(x) {
+            console.error(x);
+            alert('⚠️ No se pudieron cargar los datos desde Supabase. Revisa tu conexión a internet y vuelve a intentar. (' + (x.message || x) + ')');
+            return false;
+        }
+    },
+
+    generarId() {
+        return Math.random().toString(36).slice(2, 11);
+    },
+
+    conectarEventos() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
+                const id = e.target.getAttribute('data-section');
+                document.getElementById(id).classList.add('active');
+                e.target.classList.add('active');
+                this.actualizarTodo();
+            });
+        });
+
+        ['prod', 'comp', 'vent', 'ent'].forEach(tipo => {
+            const search = document.getElementById('search-' + tipo);
+            if(search) search.addEventListener('keyup', () => this.buscar(tipo));
+        });
+
+        const searchInv = document.getElementById('search-inv');
+        if(searchInv) searchInv.addEventListener('keyup', () => {
+            const q = searchInv.value.toLowerCase();
+            Array.from(document.getElementById('tabla-inventario').querySelectorAll('tr')).forEach(fila => {
+                fila.style.display = fila.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        const hoy = hoyISO();
+        if(document.getElementById('comp-fecha')) document.getElementById('comp-fecha').value = hoy;
+        if(document.getElementById('vent-fecha')) document.getElementById('vent-fecha').value = hoy;
+
+        inicializarAutocomplete('item-ref', 'item-ref-list', () => sugerirCostoItem());
+        inicializarAutocomplete('comp-ref', 'comp-ref-list');
+        inicializarAutocompleteCliente('vent-cliente', 'vent-cliente-list');
+        inicializarAutocompleteCiudad('vent-ciudad', 'vent-ciudad-list');
+        inicializarFiltrosTablas();
+    },
+
+    buscar(tipo) {
+        const input = document.getElementById('search-' + tipo).value.toLowerCase();
+        const tabla = document.getElementById('tabla-' + (tipo === 'prod' ? 'productos' : tipo === 'comp' ? 'compras' : tipo === 'vent' ? 'ventas' : 'entregas'));
+        Array.from(tabla.querySelectorAll('tr')).forEach(fila => {
+            fila.style.display = fila.textContent.toLowerCase().includes(input) ? '' : 'none';
+        });
+    },
+
+    actualizarTodo() {
+        this.actualizarProductos();
+        this.actualizarCompras();
+        this.actualizarVentas();
+        this.actualizarEntregas();
+        this.actualizarDashboard();
+        this.actualizarInventario();
+        this.actualizarReportes();
+    },
+
+    // Valora el stock que queda con FIFO: arma los lotes de compra de cada
+    // referencia, los va consumiendo en orden con las ventas ya hechas, y lo
+    // que sobra es el inventario real con el costo de los lotes que quedaron.
+    calcularInventario() {
+        const lotesPorRef = {};
+        this.datos.compras.slice()
+            .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))
+            .forEach(c => {
+                if(!c.ref) return;
+                (lotesPorRef[c.ref] = lotesPorRef[c.ref] || []).push({
+                    cantidad: c.cantidad || 0,
+                    costo_unitario: c.costo_unitario || 0
+                });
+            });
+
+        const vendidoPorRef = {};
+        this.datos.ventas.forEach(v => {
+            itemsDeVenta(v).forEach(it => {
+                if(!it.ref) return;
+                vendidoPorRef[it.ref] = (vendidoPorRef[it.ref] || 0) + (it.cantidad || 0);
+            });
+        });
+
+        const refs = new Set([
+            ...this.datos.productos.map(p => p.ref),
+            ...Object.keys(lotesPorRef)
+        ].filter(Boolean));
+
+        const filas = [];
+        refs.forEach(ref => {
+            const lotes = (lotesPorRef[ref] || []).map(l => ({...l}));
+            let porConsumir = vendidoPorRef[ref] || 0;
+            while(porConsumir > 0 && lotes.length) {
+                const tomar = Math.min(lotes[0].cantidad, porConsumir);
+                lotes[0].cantidad -= tomar;
+                porConsumir -= tomar;
+                if(lotes[0].cantidad <= 0) lotes.shift();
+            }
+
+            const cantidad = lotes.reduce((s, l) => s + l.cantidad, 0);
+            const valorTotal = lotes.reduce((s, l) => s + l.cantidad * l.costo_unitario, 0);
+            const prod = this.datos.productos.find(p => p.ref === ref);
+
+            filas.push({
+                ref,
+                nombre: prod ? prod.nombre : '-',
+                cantidad,
+                // Si quedó stock, el costo unitario es el promedio de los lotes
+                // que siguen en bodega; si no queda nada, se muestra el último
+                // costo de compra conocido como referencia.
+                costoUnitario: cantidad > 0 ? valorTotal / cantidad
+                    : ((lotesPorRef[ref] || []).slice(-1)[0] || {}).costo_unitario || 0,
+                valorTotal,
+                sobrevendido: porConsumir > 0 ? porConsumir : 0
+            });
+        });
+
+        filas.sort((a, b) => b.valorTotal - a.valorTotal || a.ref.localeCompare(b.ref));
+        return filas;
+    },
+
+    actualizarInventario(verTodos) {
+        if(verTodos !== undefined) this._invVerTodos = verTodos;
+        const mostrarTodos = !!this._invVerTodos;
+
+        const btnCon = document.getElementById('inv-btn-con');
+        const btnTodos = document.getElementById('inv-btn-todos');
+        if(btnCon && btnTodos) {
+            btnCon.style.fontWeight = mostrarTodos ? 'normal' : '700';
+            btnTodos.style.fontWeight = mostrarTodos ? '700' : 'normal';
+        }
+
+        const todas = this.calcularInventario();
+        this._inventarioCache = todas;
+        const filas = mostrarTodos ? todas : todas.filter(f => f.cantidad > 0);
+
+        const tabla = document.getElementById('tabla-inventario');
+        if(!tabla) return;
+        tabla.innerHTML = filas.map(f => {
+            const alerta = f.sobrevendido > 0
+                ? ` <span style="color:#c0575c; font-size:11px;" title="Se vendieron más unidades de las compradas">⚠ ${f.sobrevendido} sin respaldo de compra</span>`
+                : '';
+            return `<tr><td><strong>${f.ref}</strong>${alerta}</td><td>${f.nombre}</td><td>$${Math.round(f.costoUnitario).toLocaleString('es-CO')}</td><td>${f.cantidad}</td><td>$${Math.round(f.valorTotal).toLocaleString('es-CO')}</td></tr>`;
+        }).join('');
+        if(filas.length === 0) tabla.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Sin stock disponible</td></tr>';
+
+        const totalCant = filas.reduce((s, f) => s + f.cantidad, 0);
+        const totalValor = filas.reduce((s, f) => s + f.valorTotal, 0);
+        const conStock = todas.filter(f => f.cantidad > 0).length;
+
+        document.getElementById('inv-foot-cant').textContent = totalCant;
+        document.getElementById('inv-foot-valor').textContent = '$' + Math.round(totalValor).toLocaleString('es-CO');
+        document.getElementById('inv-valor-total').textContent = '$' + Math.round(todas.reduce((s, f) => s + f.valorTotal, 0)).toLocaleString('es-CO');
+        document.getElementById('inv-unidades').textContent = todas.reduce((s, f) => s + f.cantidad, 0);
+        document.getElementById('inv-refs').textContent = conStock;
+        document.getElementById('inv-refs-label').textContent = 'de ' + todas.length + ' referencias';
+    },
+
+    actualizarProductos() {
+        const tabla = document.getElementById('tabla-productos');
+        tabla.innerHTML = '';
+        this.datos.productos.forEach(p => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td><strong>${p.ref}</strong></td><td>${p.nombre}</td><td>${p.color || '-'}</td><td>${p.longitud || '-'}</td><td>${p.tipo || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${p.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${p.id}')">🗑️</button></td>`;
+            tabla.appendChild(fila);
+        });
+        if(this.datos.productos.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin productos. ¡Agrega uno!</td></tr>';
+    },
+
+    actualizarCompras() {
+        const tabla = document.getElementById('tabla-compras');
+        tabla.innerHTML = '';
+        const ordenadas = [...this.datos.compras].sort((a, b) => b.fecha.localeCompare(a.fecha));
+        ordenadas.forEach(c => {
+            const prod = this.datos.productos.find(p => p.ref === c.ref);
+            const nombreMostrar = c.nombre || (prod ? prod.nombre : '-');
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td>${formatearFecha(c.fecha)}</td><td>${c.proveedor || '-'}</td><td>${nombreMostrar}</td><td><strong>${c.ref}</strong></td><td>${c.cantidad}</td><td>$${c.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarCompra('${c.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarCompra('${c.id}')">🗑️</button></td>`;
+            tabla.appendChild(fila);
+        });
+        if(this.datos.compras.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin compras registradas</td></tr>';
+        actualizarListaProveedores();
+    },
+
+    actualizarVentas() {
+        const pintarTabla = (tbodyId, ventas, mensajeVacio) => {
+            const tbody = document.getElementById(tbodyId);
+            if(!tbody) return;
+            tbody.innerHTML = ventas.map(v => `<tr>${filaVentaHTML(v)}</tr>`).join('');
+            if(ventas.length === 0) tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: #999;">${mensajeVacio}</td></tr>`;
+        };
+
+        const ordenadas = [...this.datos.ventas].sort((a, b) => b.fecha.localeCompare(a.fecha));
+        pintarTabla('tabla-ventas', ordenadas, 'Sin ventas registradas');
+
+        const envioPendiente = ordenadas.filter(v => {
+            const entrega = this.datos.entregas.find(e => e.venta_id === v.id);
+            return entrega && !esGuiaValida(entrega.guia);
+        });
+        pintarTabla('tabla-ventas-envios', envioPendiente, 'No hay envíos pendientes de asignar guía 🎉');
+
+        const cobroPendiente = ordenadas.filter(v => v.saldo > 0);
+        pintarTabla('tabla-ventas-cobro', cobroPendiente, 'No hay saldos pendientes por cobrar 🎉');
+    },
+
+    actualizarEntregas() {
+        const tabla = document.getElementById('tabla-entregas');
+        tabla.innerHTML = '';
+        const ordenadas = [...this.datos.entregas].sort((a, b) => b.fecha.localeCompare(a.fecha));
+        ordenadas.forEach(e => {
+            const dias = Math.floor((new Date() - parsearFechaLocal(e.fecha)) / (1000 * 60 * 60 * 24));
+            const guiaAsignada = esGuiaValida(e.guia) ? e.guia : 'Sin asignar';
+            const estadoClass = e.saldo === 0 ? 'color:#2e7d5c;font-weight:bold;' : 'color:#c0575c;';
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td><strong>${guiaAsignada}</strong></td><td>${e.cliente}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${e.empresa || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${e.id}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${e.id}')" title="Asignar guía">🏷️</button></td>`;
+            tabla.appendChild(fila);
+        });
+        if(this.datos.entregas.length === 0) tabla.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">Sin entregas registradas</td></tr>';
+
+        const recibido = this.datos.entregas.reduce((sum, e) => sum + e.abono, 0);
+        const total = this.datos.entregas.reduce((sum, e) => sum + e.monto, 0);
+        const transito = total - recibido;
+        const hoy = new Date();
+        const vencido = this.datos.entregas.filter(e => e.saldo > 0 && (hoy - parsearFechaLocal(e.fecha)) > 30 * 24 * 60 * 60 * 1000).reduce((sum, e) => sum + e.saldo, 0);
+
+        document.getElementById('ent-recibido').textContent = '$' + recibido.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('ent-transito').textContent = '$' + transito.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('ent-vencido').textContent = '$' + vencido.toLocaleString('es-CO', {maximumFractionDigits: 0});
+
+        actualizarListaEmpresas();
+    },
+
+    actualizarDashboard() {
+        const hoy = new Date();
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0, 23, 59, 59, 999);
+        const enMesActual = (fechaStr) => {
+            const f = parsearFechaLocal(fechaStr);
+            return f >= inicioMes && f <= finMes;
+        };
+
+        const comprasMes = this.datos.compras.filter(c => enMesActual(c.fecha));
+        const ventasMes = this.datos.ventas.filter(v => enMesActual(v.fecha));
+        const entregasMes = this.datos.entregas.filter(e => enMesActual(e.fecha));
+
+        const compras = comprasMes.reduce((s, c) => s + c.costo_total, 0);
+        const ventas = ventasMes.reduce((s, v) => s + v.total, 0);
+        const cant_c = comprasMes.reduce((s, c) => s + c.cantidad, 0);
+        const cant_v = ventasMes.reduce((s, v) => s + itemsDeVenta(v).reduce((si, it) => si + (it.cantidad || 0), 0), 0);
+        const utilidad = ventasMes.reduce((s, v) => s + (v.utilidad !== undefined ? v.utilidad : (v.total - (v.costo_total || 0) - (v.costo_envio || 0))), 0);
+        const margen = ventas > 0 ? ((utilidad / ventas) * 100).toFixed(1) : 0;
+        const stock = cant_c - cant_v;
+        const recibido = entregasMes.reduce((sum, e) => sum + e.abono, 0);
+        const total_ent = entregasMes.reduce((sum, e) => sum + e.monto, 0);
+        const transito = total_ent - recibido;
+
+        document.getElementById('dash-compras').textContent = '$' + compras.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('dash-cant-compras').textContent = cant_c + ' unidades';
+        document.getElementById('dash-ventas').textContent = '$' + ventas.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('dash-cant-ventas').textContent = cant_v + ' unidades';
+        document.getElementById('dash-ganancia').textContent = '$' + utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('dash-margen').textContent = margen + '%';
+        document.getElementById('dash-stock').textContent = stock;
+        document.getElementById('dash-transito').textContent = '$' + transito.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('dash-productos').textContent = this.datos.productos.length;
+
+        const ultimas = document.getElementById('dash-ultimas');
+        ultimas.innerHTML = '';
+        const ops = [
+            ...this.datos.compras.slice(-5).map(c => ({tipo: 'Compra', fecha: c.fecha, desc: c.ref, monto: c.costo_total})),
+            ...this.datos.ventas.slice(-5).map(v => ({tipo: 'Venta', fecha: v.fecha, desc: itemsDeVenta(v).map(it => it.ref).join(', '), monto: v.total}))
+        ].sort((a, b) => parsearFechaLocal(b.fecha) - parsearFechaLocal(a.fecha)).slice(0, 10);
+
+        ops.forEach(op => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td>${op.tipo}</td><td>${formatearFecha(op.fecha)}</td><td>${op.desc}</td><td>$${op.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+            ultimas.appendChild(fila);
+        });
+
+        if(document.getElementById('dash-chart')) dibujarGraficoVentas(chartMesesActual);
+    },
+
+    actualizarReportes() {
+        const compras = this.datos.compras.reduce((s, c) => s + c.costo_total, 0);
+        const ventas = this.datos.ventas.reduce((s, v) => s + v.total, 0);
+        const ganancia = ventas - compras;
+        const margen = ventas > 0 ? ((ganancia / ventas) * 100).toFixed(1) : 0;
+
+        document.getElementById('rep-compras').textContent = '$' + compras.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('rep-ventas').textContent = '$' + ventas.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('rep-ganancia').textContent = '$' + ganancia.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('rep-margen').textContent = margen + '%';
+
+        // El costo por producto se toma del costo FIFO ya calculado en cada
+        // línea de venta (item.costo_total), no del total histórico de
+        // compras -- así no se le carga a un producto el costo de unidades
+        // que todavía están en inventario sin vender.
+        const top = {};
+        this.datos.ventas.forEach(v => {
+            itemsDeVenta(v).forEach(it => {
+                if(!top[it.ref]) top[it.ref] = {cant: 0, ingr: 0, costo: 0};
+                top[it.ref].cant += it.cantidad || 0;
+                top[it.ref].ingr += it.subtotal !== undefined ? it.subtotal : (it.cantidad || 0) * (it.precio || 0);
+                top[it.ref].costo += it.costo_total || 0;
+            });
+        });
+
+        const tabla_top = document.getElementById('tabla-top');
+        tabla_top.innerHTML = '';
+        Object.entries(top).sort((a, b) => b[1].cant - a[1].cant).slice(0, 10).forEach(([ref, dados]) => {
+            const prod = this.datos.productos.find(p => p.ref === ref);
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td><strong>${ref}</strong></td><td>${prod ? prod.nombre : '-'}</td><td>${dados.cant}</td><td>$${dados.ingr.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.ingr - dados.costo).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+            tabla_top.appendChild(fila);
+        });
+
+        const empresas = {};
+        this.datos.entregas.forEach(e => {
+            if(!empresas[e.empresa]) empresas[e.empresa] = {enviado: 0, recibido: 0};
+            empresas[e.empresa].enviado += e.monto;
+            empresas[e.empresa].recibido += e.abono;
+        });
+
+        const tabla_emp = document.getElementById('tabla-empresas');
+        tabla_emp.innerHTML = '';
+        Object.entries(empresas).forEach(([emp, dados]) => {
+            const pct = ((dados.recibido / dados.enviado) * 100).toFixed(1);
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td><strong>${emp}</strong></td><td>$${dados.enviado.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${dados.recibido.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.enviado - dados.recibido).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${pct}%</td>`;
+            tabla_emp.appendChild(fila);
+        });
+    },
+
+    async eliminarProducto(id) {
+        if(!confirm('¿Eliminar producto?')) return;
+        const { error } = await supabaseClient.from('productos').delete().eq('id', id);
+        if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
+        this.datos.productos = this.datos.productos.filter(p => p.id !== id);
+        this.actualizarProductos();
+    },
+
+    async eliminarCompra(id) {
+        if(!confirm('¿Eliminar compra?')) return;
+        const { error } = await supabaseClient.from('compras').delete().eq('id', id);
+        if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
+        this.datos.compras = this.datos.compras.filter(c => c.id !== id);
+        this.actualizarTodo();
+    },
+
+    async eliminarVenta(id) {
+        if(!confirm('¿Eliminar venta?')) return;
+        // Borrar la venta hace cascade en Supabase sobre venta_items y
+        // entregas (y esta última sobre pagos) -- ver on delete cascade
+        // en supabase_schema.sql.
+        const { error } = await supabaseClient.from('ventas').delete().eq('id', id);
+        if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
+        this.datos.ventas = this.datos.ventas.filter(v => v.id !== id);
+        this.datos.entregas = this.datos.entregas.filter(e => e.venta_id !== id);
+        this.actualizarTodo();
+    }
+};
+
+async function agregarProducto(e) {
+    e.preventDefault();
+    const ref = document.getElementById('prod-ref').value.trim();
+    const nombre = document.getElementById('prod-nombre').value.trim();
+    if(!ref || !nombre) { alert('Referencia y nombre obligatorios'); return; }
+    const datosProd = {
+        ref, nombre,
+        color: document.getElementById('prod-color').value.trim(),
+        longitud: document.getElementById('prod-long').value.trim(),
+        tipo: document.getElementById('prod-tipo').value.trim(),
+        precio: parseFloat(document.getElementById('prod-precio').value) || 0
+    };
+    const editId = document.getElementById('prod-edit-id').value;
+    if(editId) {
+        const { error } = await supabaseClient.from('productos').update(datosProd).eq('id', editId);
+        if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
+        const p = APP.datos.productos.find(x => x.id === editId);
+        if(p) Object.assign(p, datosProd);
+        cancelarEdicionProducto();
+        alert('✅ Producto actualizado');
+    } else {
+        const { data, error } = await supabaseClient.from('productos').insert(datosProd).select();
+        if(error) { alert('❌ Error al agregar: ' + error.message); return; }
+        APP.datos.productos.push(data[0]);
+        e.target.reset();
+        alert('✅ Producto agregado');
+    }
+    APP.actualizarProductos();
+}
+
+function editarProducto(id) {
+    const p = APP.datos.productos.find(x => x.id === id);
+    if(!p) return;
+    document.getElementById('prod-edit-id').value = id;
+    document.getElementById('prod-ref').value = p.ref;
+    document.getElementById('prod-nombre').value = p.nombre;
+    document.getElementById('prod-color').value = p.color || '';
+    document.getElementById('prod-long').value = p.longitud || '';
+    document.getElementById('prod-tipo').value = p.tipo || '';
+    document.getElementById('prod-precio').value = p.precio || '';
+    document.getElementById('prod-submit-btn').textContent = '💾 Guardar Cambios';
+    document.getElementById('prod-cancel-btn').style.display = 'inline-block';
+    document.getElementById('prod-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+function cancelarEdicionProducto() {
+    document.getElementById('prod-edit-id').value = '';
+    document.querySelector('#productos form').reset();
+    document.getElementById('prod-submit-btn').textContent = '➕ Agregar Producto';
+    document.getElementById('prod-cancel-btn').style.display = 'none';
+}
+
+async function agregarCompra(e) {
+    e.preventDefault();
+    const fecha = document.getElementById('comp-fecha').value;
+    const prov = document.getElementById('comp-prov').value.trim();
+    const refInput = document.getElementById('comp-ref');
+    const ref = refInput.value.trim();
+    const cant = parseInt(document.getElementById('comp-cant').value) || 0;
+    const costo = parseFloat(document.getElementById('comp-costo').value) || 0;
+    if(!fecha || !prov || !ref || cant <= 0 || costo <= 0) { alert('Completa los campos'); return; }
+
+    const nombreSeleccionado = refInput.dataset.nombreSeleccionado;
+    const prod = APP.datos.productos.find(p => p.ref === ref);
+    const nombre = nombreSeleccionado || (prod ? prod.nombre : '');
+
+    if(!prod) { alert('❌ Esa referencia no existe en Productos. Créala primero en el módulo Productos.'); return; }
+
+    const editId = document.getElementById('comp-edit-id').value;
+    if(editId) {
+        const cambios = { fecha, proveedor: prov, ref, nombre: nombre || '', cantidad: cant, costo_unitario: costo, costo_total: cant * costo };
+        const { error } = await supabaseClient.from('compras').update(cambios).eq('id', editId);
+        if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
+        const c = APP.datos.compras.find(x => x.id === editId);
+        if(c) Object.assign(c, cambios);
+        cancelarEdicionCompra();
+        alert('✅ Compra actualizada');
+    } else {
+        const nuevo = { fecha, proveedor: prov, ref, nombre, cantidad: cant, costo_unitario: costo, costo_total: cant * costo };
+        const { data, error } = await supabaseClient.from('compras').insert(nuevo).select();
+        if(error) { alert('❌ Error al registrar: ' + error.message); return; }
+        APP.datos.compras.push(data[0]);
+        e.target.reset();
+        document.getElementById('comp-fecha').value = hoyISO();
+        alert('✅ Compra registrada');
+    }
+    refInput.dataset.nombreSeleccionado = '';
+    APP.actualizarTodo();
+}
+
+function editarCompra(id) {
+    const c = APP.datos.compras.find(x => x.id === id);
+    if(!c) return;
+    document.getElementById('comp-edit-id').value = id;
+    document.getElementById('comp-fecha').value = c.fecha;
+    document.getElementById('comp-prov').value = c.proveedor || '';
+    const refInput = document.getElementById('comp-ref');
+    refInput.value = c.ref;
+    refInput.dataset.nombreSeleccionado = c.nombre || '';
+    document.getElementById('comp-cant').value = c.cantidad;
+    document.getElementById('comp-costo').value = c.costo_unitario;
+    document.getElementById('comp-submit-btn').textContent = '💾 Guardar Cambios';
+    document.getElementById('comp-cancel-btn').style.display = 'inline-block';
+    document.getElementById('comp-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+function cancelarEdicionCompra() {
+    document.getElementById('comp-edit-id').value = '';
+    document.querySelector('#compras form').reset();
+    document.getElementById('comp-fecha').value = hoyISO();
+    document.getElementById('comp-submit-btn').textContent = '➕ Registrar Compra';
+    document.getElementById('comp-cancel-btn').style.display = 'none';
+}
+
+let chartMesesActual = 1;
+
+function dibujarGraficoVentas(meses) {
+    chartMesesActual = meses;
+    document.querySelectorAll('.chart-filtro-btn').forEach(b => b.classList.remove('active'));
+    const btnActivo = document.getElementById('chart-btn-' + meses);
+    if(btnActivo) btnActivo.classList.add('active');
+
+    const canvas = document.getElementById('dash-chart');
+    if(!canvas) return;
+    const contenedor = canvas.parentElement;
+    const ancho = contenedor.clientWidth > 40 ? contenedor.clientWidth - 20 : 700;
+    canvas.width = ancho;
+    canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const hoy = new Date();
+    const desde = new Date();
+    desde.setMonth(desde.getMonth() - meses);
+
+    // Período anterior = el mismo lapso justo antes del actual (ej. si el
+    // filtro es "último mes", compara contra el mes anterior a ese).
+    const desdeAnt = new Date(desde);
+    desdeAnt.setMonth(desdeAnt.getMonth() - meses);
+    const hoyAnt = new Date(desde);
+
+    // Se agrupa en "cubetas" de 7 días contadas desde el inicio del período
+    // (no por semana calendario) para que el bloque i del período actual
+    // quede alineado exactamente con el bloque i del período anterior.
+    const msPorSemana = 7 * 24 * 60 * 60 * 1000;
+    const numSemanas = Math.max(1, Math.ceil((hoy - desde) / msPorSemana));
+
+    const serieActual = new Array(numSemanas).fill(0);
+    const serieAnterior = new Array(numSemanas).fill(0);
+
+    APP.datos.ventas.forEach(v => {
+        const f = parsearFechaLocal(v.fecha);
+        if(f >= desde && f <= hoy) {
+            const idx = Math.min(numSemanas - 1, Math.floor((f - desde) / msPorSemana));
+            serieActual[idx] += v.total;
+        } else if(f >= desdeAnt && f <= hoyAnt) {
+            const idx = Math.min(numSemanas - 1, Math.floor((f - desdeAnt) / msPorSemana));
+            serieAnterior[idx] += v.total;
+        }
+    });
+
+    const totalActual = serieActual.reduce((a, b) => a + b, 0);
+    const totalAnterior = serieAnterior.reduce((a, b) => a + b, 0);
+
+    const margenIzq = 70, margenInf = 45, margenSup = 36, margenDer = 20;
+    const anchoGrafico = canvas.width - margenIzq - margenDer;
+    const altoGrafico = canvas.height - margenSup - margenInf;
+
+    if(totalActual === 0 && totalAnterior === 0) {
+        ctx.fillStyle = '#999';
+        ctx.font = '14px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sin ventas en este período', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    const maxValor = Math.max(...serieActual, ...serieAnterior, 1);
+    const espacioGrupo = anchoGrafico / numSemanas;
+    const anchoBarra = Math.min(espacioGrupo * 0.38, 22);
+
+    ctx.strokeStyle = '#f5eaef';
+    ctx.fillStyle = '#999';
+    ctx.font = '11px Segoe UI';
+    ctx.textAlign = 'right';
+    for(let i = 0; i <= 4; i++) {
+        const y = margenSup + altoGrafico - (altoGrafico * i / 4);
+        const valor = maxValor * i / 4;
+        ctx.beginPath();
+        ctx.moveTo(margenIzq, y);
+        ctx.lineTo(margenIzq + anchoGrafico, y);
+        ctx.stroke();
+        ctx.fillText('$' + Math.round(valor / 1000) + 'k', margenIzq - 8, y + 4);
+    }
+
+    ctx.strokeStyle = '#e8759f';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(margenIzq, margenSup);
+    ctx.lineTo(margenIzq, margenSup + altoGrafico);
+    ctx.lineTo(margenIzq + anchoGrafico, margenSup + altoGrafico);
+    ctx.stroke();
+
+    const saltoEtiqueta = Math.max(1, Math.ceil(numSemanas / 13));
+    for(let idx = 0; idx < numSemanas; idx++) {
+        const x0 = margenIzq + idx * espacioGrupo;
+
+        const valAnt = serieAnterior[idx];
+        const altoAnt = (valAnt / maxValor) * altoGrafico;
+        ctx.fillStyle = '#d8bfc9';
+        ctx.fillRect(x0 + espacioGrupo / 2 - anchoBarra - 2, margenSup + altoGrafico - altoAnt, anchoBarra, altoAnt);
+
+        const valAct = serieActual[idx];
+        const altoAct = (valAct / maxValor) * altoGrafico;
+        const grad = ctx.createLinearGradient(0, margenSup + altoGrafico - altoAct, 0, margenSup + altoGrafico);
+        grad.addColorStop(0, '#ef8fb2');
+        grad.addColorStop(1, '#f8c2d8');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x0 + espacioGrupo / 2 + 2, margenSup + altoGrafico - altoAct, anchoBarra, altoAct);
+
+        if(idx % saltoEtiqueta === 0) {
+            const fechaBucket = new Date(desde.getTime() + idx * msPorSemana);
+            ctx.save();
+            ctx.translate(x0 + espacioGrupo / 2, margenSup + altoGrafico + 14);
+            ctx.rotate(-Math.PI / 4);
+            ctx.fillStyle = '#666';
+            ctx.font = '10px Segoe UI';
+            ctx.textAlign = 'right';
+            ctx.fillText(fechaBucket.toLocaleDateString('es-CO', {day: '2-digit', month: '2-digit'}), 0, 0);
+            ctx.restore();
+        }
+    }
+
+    ctx.font = '12px Segoe UI';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ef8fb2';
+    ctx.fillRect(margenIzq, 8, 14, 14);
+    ctx.fillStyle = '#333';
+    const etiquetaPeriodo = meses === 1 ? 'mes' : meses + ' meses';
+    ctx.fillText('Últim' + (meses === 1 ? 'o' : 'os') + ' ' + etiquetaPeriodo + ' ($' + totalActual.toLocaleString('es-CO', {maximumFractionDigits: 0}) + ')', margenIzq + 20, 19);
+
+    const anteriorLabelX = margenIzq + Math.min(260, anchoGrafico * 0.42);
+    ctx.fillStyle = '#d8bfc9';
+    ctx.fillRect(anteriorLabelX, 8, 14, 14);
+    ctx.fillStyle = '#333';
+    const variacion = totalAnterior > 0 ? ((totalActual - totalAnterior) / totalAnterior * 100) : null;
+    const textoVar = variacion === null ? '' : '  ' + (variacion >= 0 ? '▲ +' : '▼ ') + variacion.toFixed(0) + '%';
+    ctx.fillText('Período anterior ($' + totalAnterior.toLocaleString('es-CO', {maximumFractionDigits: 0}) + ')', anteriorLabelX + 20, 19);
+    if(variacion !== null) {
+        const anchoPrev = ctx.measureText('Período anterior ($' + totalAnterior.toLocaleString('es-CO', {maximumFractionDigits: 0}) + ')').width;
+        ctx.fillStyle = variacion >= 0 ? '#2e7d5c' : '#c0575c';
+        ctx.font = 'bold 12px Segoe UI';
+        ctx.fillText(textoVar, anteriorLabelX + 20 + anchoPrev, 19);
+    }
+}
+
+let carritoActual = [];
+
+function inicializarAutocomplete(inputId, listaId, onSelect) {
+    const input = document.getElementById(inputId);
+    const lista = document.getElementById(listaId);
+    if(!input || !lista) return;
+
+    const ocultar = () => { lista.style.display = 'none'; lista.innerHTML = ''; };
+
+    const elegir = (ref, nombre) => {
+        input.value = ref;
+        input.dataset.nombreSeleccionado = nombre || '';
+        ocultar();
+        if(onSelect) onSelect(ref, nombre);
+    };
+
+    const filtrar = () => {
+        input.dataset.nombreSeleccionado = '';
+        const q = input.value.trim().toLowerCase();
+        if(!q) { ocultar(); return; }
+        const coincidencias = APP.datos.productos.filter(p =>
+            p.ref.toLowerCase().includes(q) || (p.nombre && p.nombre.toLowerCase().includes(q))
+        ).slice(0, 8);
+        if(coincidencias.length === 0) { ocultar(); return; }
+        lista.innerHTML = coincidencias.map(p =>
+            `<div class="autocomplete-item" data-ref="${p.ref}" data-nombre="${(p.nombre || '').replace(/"/g, '&quot;')}"><strong>${p.ref}</strong><span class="ac-nombre">${p.nombre || ''}</span></div>`
+        ).join('');
+        lista.style.display = 'block';
+    };
+
+    input.addEventListener('input', filtrar);
+    input.addEventListener('focus', () => { if(input.value.trim()) filtrar(); });
+    input.addEventListener('blur', () => setTimeout(ocultar, 150));
+    input.addEventListener('keydown', e => {
+        if(e.key === 'Enter' && lista.style.display === 'block' && lista.firstChild) {
+            e.preventDefault();
+            elegir(lista.firstChild.getAttribute('data-ref'), lista.firstChild.getAttribute('data-nombre'));
+        } else if(e.key === 'Escape') {
+            ocultar();
+        }
+    });
+    lista.addEventListener('mousedown', e => {
+        const item = e.target.closest('.autocomplete-item');
+        if(item) elegir(item.getAttribute('data-ref'), item.getAttribute('data-nombre'));
+    });
+}
+
+// Autocompletar de clientes: a diferencia de productos (donde se escribe la
+// referencia y se muestra el nombre), aquí se escribe/selecciona el nombre
+// directamente. Si el nombre escrito coincide con un cliente existente,
+// input.dataset.clienteId queda con su id; si no, agregarVenta() crea un
+// cliente nuevo con ese nombre.
+function inicializarAutocompleteCliente(inputId, listaId) {
+    const input = document.getElementById(inputId);
+    const lista = document.getElementById(listaId);
+    if(!input || !lista) return;
+
+    const ocultar = () => { lista.style.display = 'none'; lista.innerHTML = ''; };
+
+    const elegir = (nombre, id) => {
+        input.value = nombre;
+        input.dataset.clienteId = id || '';
+        ocultar();
+    };
+
+    const filtrar = () => {
+        input.dataset.clienteId = '';
+        const q = input.value.trim().toLowerCase();
+        if(!q) { ocultar(); return; }
+        const coincidencias = (APP.datos.clientes || []).filter(c =>
+            c.nombre.toLowerCase().includes(q)
+        ).slice(0, 8);
+        if(coincidencias.length === 0) { ocultar(); return; }
+        lista.innerHTML = coincidencias.map(c =>
+            `<div class="autocomplete-item" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g, '&quot;')}"><strong>${c.nombre}</strong>${c.ciudad ? `<span class="ac-nombre">${c.ciudad}</span>` : ''}</div>`
+        ).join('');
+        lista.style.display = 'block';
+    };
+
+    input.addEventListener('input', filtrar);
+    input.addEventListener('focus', () => { if(input.value.trim()) filtrar(); });
+    input.addEventListener('blur', () => setTimeout(ocultar, 150));
+    input.addEventListener('keydown', e => {
+        if(e.key === 'Enter' && lista.style.display === 'block' && lista.firstChild) {
+            e.preventDefault();
+            elegir(lista.firstChild.getAttribute('data-nombre'), lista.firstChild.getAttribute('data-id'));
+        } else if(e.key === 'Escape') {
+            ocultar();
+        }
+    });
+    lista.addEventListener('mousedown', e => {
+        const item = e.target.closest('.autocomplete-item');
+        if(item) elegir(item.getAttribute('data-nombre'), item.getAttribute('data-id'));
+    });
+}
+
+function aISOLocal(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dia}`;
+}
+
+function hoyISO() {
+    // "new Date().toISOString()" siempre da la fecha en UTC: de noche en
+    // Colombia (UTC-5) eso puede mostrar el día de MAÑANA como "hoy". Esta
+    // función arma la fecha de hoy con los componentes de la hora local.
+    return aISOLocal(new Date());
+}
+
+function parsearFechaLocal(fechaStr) {
+    // "new Date('YYYY-MM-DD')" interpreta la fecha en UTC en vez de en hora
+    // local. Comparado contra límites construidos en hora local (como "hoy"
+    // o el primer/último día del mes), esto puede incluir o excluir
+    // transacciones equivocadamente cerca de los bordes, y desfasa en 1 día
+    // los conteos de "días transcurridos". Esta función arma la fecha con
+    // sus componentes locales para evitar ese problema.
+    if(!fechaStr) return new Date(NaN);
+    const partes = String(fechaStr).split('-');
+    if(partes.length !== 3) return new Date(fechaStr);
+    const [y, m, d] = partes.map(Number);
+    if(!y || !m || !d) return new Date(fechaStr);
+    return new Date(y, m - 1, d);
+}
+
+function formatearFecha(fechaStr) {
+    if(!fechaStr) return '-';
+    return parsearFechaLocal(fechaStr).toLocaleDateString('es-CO');
+}
+
+function itemsDeVenta(v) {
+    if(v.items && v.items.length) return v.items;
+    return [{
+        ref: v.ref, nombre: '', cantidad: v.cantidad || 0, precio: v.precio || 0,
+        subtotal: v.total !== undefined ? v.total : (v.cantidad || 0) * (v.precio || 0),
+        costo_unitario: v.costo_unitario || 0, costo_total: v.costo_total || 0
+    }];
+}
+
+function filaVentaHTML(v) {
+    const costo = v.costo_total || 0;
+    const envio = v.costo_envio || 0;
+    const utilidad = v.utilidad !== undefined ? v.utilidad : (v.total - costo - envio);
+    const items = itemsDeVenta(v);
+    const resumen = items.map(it => {
+        const prod = APP.datos.productos.find(p => p.ref === it.ref);
+        const nombre = it.nombre || (prod ? prod.nombre : '');
+        return `<strong>${it.ref}</strong>${nombre ? ' ' + nombre : ''} x${it.cantidad}`;
+    }).join(', ');
+    const clienteReal = v.cliente_id ? (v.cliente || v.cliente_nombre || '') : '';
+    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${clienteReal}</td><td>${normalizarCiudad(v.ciudad) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarVenta('${v.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${v.id}')">🗑️</button></td>`;
+}
+
+function calcularCostoFIFO(ref, cantidadNueva, fechaVenta) {
+    // Lotes de compra de esa referencia disponibles hasta la fecha de la venta,
+    // ordenados del más antiguo al más nuevo (clonados para no tocar los datos reales).
+    const lotes = APP.datos.compras
+        .filter(c => c.ref === ref && c.fecha <= fechaVenta)
+        .sort((a, b) => a.fecha.localeCompare(b.fecha))
+        .map(c => ({cantidad: c.cantidad, costo_unitario: c.costo_unitario}));
+
+    // Restar lo que ya consumieron (FIFO) las ventas previas de esa referencia
+    // hasta esa misma fecha, para saber qué queda disponible.
+    const ventasPrevias = [];
+    APP.datos.ventas.forEach(v => {
+        if(v.fecha > fechaVenta) return;
+        itemsDeVenta(v).forEach(it => {
+            if(it.ref === ref) ventasPrevias.push({fecha: v.fecha, cantidad: it.cantidad || 0});
+        });
+    });
+    ventasPrevias.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    ventasPrevias.forEach(vp => {
+        let pendiente = vp.cantidad;
+        while(pendiente > 0 && lotes.length) {
+            const tomar = Math.min(lotes[0].cantidad, pendiente);
+            lotes[0].cantidad -= tomar;
+            pendiente -= tomar;
+            if(lotes[0].cantidad <= 0) lotes.shift();
+        }
+    });
+
+    // Consumir la cantidad nueva desde el lote más antiguo que quede
+    let pendiente = cantidadNueva;
+    let costoTotal = 0;
+    for(const lote of lotes) {
+        if(pendiente <= 0) break;
+        const tomar = Math.min(lote.cantidad, pendiente);
+        costoTotal += tomar * lote.costo_unitario;
+        pendiente -= tomar;
+    }
+
+    if(pendiente > 0) {
+        // Sin stock FIFO suficiente registrado hasta esa fecha: usar el
+        // promedio general de compras de esa referencia como respaldo.
+        const todasCompras = APP.datos.compras.filter(c => c.ref === ref);
+        const totalCosto = todasCompras.reduce((s, c) => s + c.costo_total, 0);
+        const totalCant = todasCompras.reduce((s, c) => s + c.cantidad, 0);
+        const promedio = totalCant > 0 ? totalCosto / totalCant : 0;
+        costoTotal += pendiente * promedio;
+    }
+
+    return cantidadNueva > 0 ? costoTotal / cantidadNueva : 0;
+}
+
+function sugerirCostoItem() {
+    const ref = document.getElementById('item-ref').value.trim();
+    if(!ref) return;
+    const costoField = document.getElementById('item-costo');
+    if(!costoField.value) {
+        const fecha = document.getElementById('vent-fecha').value || hoyISO();
+        const cant = parseInt(document.getElementById('item-cant').value) || 1;
+        const costoUnitario = calcularCostoFIFO(ref, cant, fecha);
+        if(costoUnitario > 0) costoField.value = Math.round(costoUnitario);
+    }
+    const precioField = document.getElementById('item-precio');
+    if(!precioField.value) {
+        const prod = APP.datos.productos.find(p => p.ref === ref);
+        if(prod && prod.precio) precioField.value = prod.precio;
+    }
+}
+
+function agregarItemCarrito() {
+    const refInput = document.getElementById('item-ref');
+    const ref = refInput.value.trim();
+    const cant = parseInt(document.getElementById('item-cant').value) || 0;
+    const precio = parseFloat(document.getElementById('item-precio').value) || 0;
+    const costo = parseFloat(document.getElementById('item-costo').value) || 0;
+    if(!ref || cant <= 0 || precio <= 0) { alert('Completa referencia, cantidad y precio del producto'); return; }
+    const nombreSeleccionado = refInput.dataset.nombreSeleccionado;
+    const prod = APP.datos.productos.find(p => p.ref === ref);
+    const nombre = nombreSeleccionado || (prod ? prod.nombre : '');
+    carritoActual.push({
+        ref, nombre, cantidad: cant, precio,
+        costo_unitario: costo, subtotal: cant * precio, costo_total: cant * costo
+    });
+    refInput.value = '';
+    refInput.dataset.nombreSeleccionado = '';
+    document.getElementById('item-cant').value = '';
+    document.getElementById('item-precio').value = '';
+    document.getElementById('item-costo').value = '';
+    refInput.focus();
+    renderCarrito();
+}
+
+function quitarItemCarrito(idx) {
+    carritoActual.splice(idx, 1);
+    renderCarrito();
+}
+
+function renderCarrito() {
+    const tbody = document.getElementById('tabla-carrito');
+    tbody.innerHTML = '';
+    if(carritoActual.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin productos agregados aún</td></tr>';
+    } else {
+        carritoActual.forEach((it, idx) => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td><strong>${it.ref}</strong></td><td>${it.nombre || '-'}</td><td>${it.cantidad}</td><td>$${it.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button type="button" class="btn-small btn-delete" onclick="quitarItemCarrito(${idx})">🗑️</button></td>`;
+            tbody.appendChild(fila);
+        });
+    }
+    const totalVenta = carritoActual.reduce((s, i) => s + i.subtotal, 0);
+    const totalCosto = carritoActual.reduce((s, i) => s + i.costo_total, 0);
+    document.getElementById('carrito-total').textContent = '$' + totalVenta.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('carrito-costo').textContent = '$' + totalCosto.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    actualizarSaldoVenta();
+}
+
+function actualizarSaldoVenta() {
+    const el = document.getElementById('vent-saldo-display');
+    if(!el) return;
+    const total = carritoActual.reduce((s, it) => s + it.subtotal, 0);
+    const abono = parseFloat(document.getElementById('vent-abono').value) || 0;
+    const saldo = total - abono;
+    el.textContent = '$' + saldo.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    el.style.color = saldo > 0 ? '#c0575c' : '#2e7d5c';
+}
+
+function sugerirAbono() {
+    const abonoField = document.getElementById('vent-abono');
+    if(abonoField.value) return;
+    const ciudad = document.getElementById('vent-ciudad').value.trim().toLowerCase();
+    const esBogota = ciudad === 'bogota' || ciudad === 'bogotá';
+    abonoField.value = esBogota ? 10000 : 25000;
+    actualizarSaldoVenta();
+}
+
+async function agregarVenta(e) {
+    e.preventDefault();
+    if(carritoActual.length === 0) { alert('Agrega al menos un producto a la venta'); return; }
+    const fecha = document.getElementById('vent-fecha').value;
+    const clienteInput = document.getElementById('vent-cliente');
+    const cliente = clienteInput.value.trim();
+    const ciudad = document.getElementById('vent-ciudad').value.trim();
+    const costoEnvio = parseFloat(document.getElementById('vent-envio').value) || 0;
+    const abono = parseFloat(document.getElementById('vent-abono').value) || 0;
+    if(!fecha) { alert('La fecha es obligatoria'); return; }
+
+    const items = carritoActual.map(it => ({...it}));
+    const total = items.reduce((s, it) => s + it.subtotal, 0);
+    const costoTotal = items.reduce((s, it) => s + it.costo_total, 0);
+    const utilidad = total - costoTotal - costoEnvio;
+
+    // Cliente: usa el existente si vino del autocompletar; si no, busca por
+    // nombre exacto (sin distinguir mayúsculas, igual que el índice único de
+    // la base de datos) para no duplicar; si de verdad es nuevo, lo crea.
+    let clienteId = clienteInput.dataset.clienteId || null;
+    const clienteNombre = cliente || 'Cliente';
+    if(cliente && !clienteId) {
+        const existente = APP.datos.clientes.find(c => c.nombre.trim().toLowerCase() === cliente.toLowerCase());
+        if(existente) {
+            clienteId = existente.id;
+        } else {
+            const { data, error } = await supabaseClient.from('clientes').insert({ nombre: cliente, ciudad }).select();
+            if(error) { alert('❌ Error al crear el cliente: ' + error.message); return; }
+            APP.datos.clientes.push(data[0]);
+            clienteId = data[0].id;
+        }
+    }
+
+    const itemsPayload = items.map(it => ({
+        ref: it.ref, nombre: it.nombre, cantidad: it.cantidad, precio: it.precio,
+        subtotal: it.subtotal, costo_unitario: it.costo_unitario, costo_total: it.costo_total
+    }));
+
+    const editId = document.getElementById('vent-edit-id').value;
+    if(editId) {
+        const v = APP.datos.ventas.find(x => x.id === editId);
+        if(!v) { alert('No se encontró la venta a editar'); return; }
+        const cambiosVenta = {
+            fecha, cliente_id: clienteId, cliente_nombre: clienteNombre, ciudad: ciudad || 'Bogotá',
+            total, costo_total: costoTotal, costo_envio: costoEnvio, abono, saldo: total - abono, utilidad
+        };
+        const { error: errVenta } = await supabaseClient.from('ventas').update(cambiosVenta).eq('id', editId);
+        if(errVenta) { alert('❌ Error al actualizar la venta: ' + errVenta.message); return; }
+
+        // Reemplazar los productos de la venta: borrar los anteriores e
+        // insertar los actuales del carrito (más simple y seguro que
+        // comparar/parchar item por item).
+        const { error: errDel } = await supabaseClient.from('venta_items').delete().eq('venta_id', editId);
+        if(errDel) { alert('❌ Error al actualizar los productos de la venta: ' + errDel.message); return; }
+        const { data: nuevosItems, error: errIns } = await supabaseClient.from('venta_items')
+            .insert(itemsPayload.map(it => ({...it, venta_id: editId}))).select();
+        if(errIns) { alert('❌ Error al guardar los productos de la venta: ' + errIns.message); return; }
+
+        Object.assign(v, cambiosVenta, { cliente: clienteNombre, items: nuevosItems });
+
+        const entrega = APP.datos.entregas.find(x => x.venta_id === v.id);
+        if(entrega) {
+            const cambiosEntrega = { cliente_nombre: clienteNombre, fecha, monto: total, abono, saldo: Math.max(0, total - abono) };
+            const { error: errEnt } = await supabaseClient.from('entregas').update(cambiosEntrega).eq('id', entrega.id);
+            if(errEnt) { alert('❌ Error al actualizar el envío: ' + errEnt.message); return; }
+            Object.assign(entrega, cambiosEntrega, { cliente: clienteNombre });
+        }
+        cancelarEdicionVenta();
+        alert('✅ Venta actualizada');
+    } else {
+        const nuevaVenta = {
+            fecha, cliente_id: clienteId, cliente_nombre: clienteNombre, ciudad: ciudad || 'Bogotá',
+            total, costo_total: costoTotal, costo_envio: costoEnvio, abono, saldo: total - abono, utilidad
+        };
+        const { data: ventaCreada, error: errVenta } = await supabaseClient.from('ventas').insert(nuevaVenta).select();
+        if(errVenta) { alert('❌ Error al registrar la venta: ' + errVenta.message); return; }
+        const vent = ventaCreada[0];
+
+        const { data: itemsCreados, error: errItems } = await supabaseClient.from('venta_items')
+            .insert(itemsPayload.map(it => ({...it, venta_id: vent.id}))).select();
+        if(errItems) { alert('❌ Error al guardar los productos de la venta: ' + errItems.message); return; }
+
+        const nuevaEntrega = {
+            venta_id: vent.id, guia: '', cliente_nombre: clienteNombre, fecha,
+            monto: total, abono, saldo: total - abono, empresa: 'Por definir'
+        };
+        const { data: entregaCreada, error: errEnt } = await supabaseClient.from('entregas').insert(nuevaEntrega).select();
+        if(errEnt) { alert('❌ Error al crear el envío: ' + errEnt.message); return; }
+
+        const { data: pagoCreado, error: errPago } = await supabaseClient.from('pagos').insert({
+            entrega_id: entregaCreada[0].id, fecha, monto: abono, quien_paga: 'Cliente'
+        }).select();
+        if(errPago) console.error(errPago);
+
+        APP.datos.ventas.push({ ...vent, cliente: clienteNombre, items: itemsCreados });
+        APP.datos.entregas.push({ ...entregaCreada[0], cliente: clienteNombre, pagos: pagoCreado || [] });
+
+        carritoActual = [];
+        renderCarrito();
+        document.getElementById('vent-fecha').value = hoyISO();
+        clienteInput.value = '';
+        clienteInput.dataset.clienteId = '';
+        document.getElementById('vent-ciudad').value = '';
+        document.getElementById('vent-envio').value = '';
+        document.getElementById('vent-abono').value = '';
+        actualizarSaldoVenta();
+        alert(`✅ Venta registrada con ${items.length} producto(s)`);
+    }
+    APP.actualizarTodo();
+}
+
+function editarVenta(id) {
+    const v = APP.datos.ventas.find(x => x.id === id);
+    if(!v) return;
+    document.getElementById('vent-edit-id').value = id;
+    document.getElementById('vent-fecha').value = v.fecha;
+    const clienteInput = document.getElementById('vent-cliente');
+    clienteInput.value = v.cliente || '';
+    clienteInput.dataset.clienteId = v.cliente_id || '';
+    document.getElementById('vent-ciudad').value = v.ciudad || '';
+    document.getElementById('vent-envio').value = v.costo_envio || '';
+    document.getElementById('vent-abono').value = v.abono || '';
+    carritoActual = itemsDeVenta(v).map(it => ({...it}));
+    renderCarrito();
+    document.getElementById('vent-submit-btn').textContent = '💾 Guardar Cambios';
+    document.getElementById('vent-cancel-btn').style.display = 'inline-block';
+    document.getElementById('item-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+function cancelarEdicionVenta() {
+    document.getElementById('vent-edit-id').value = '';
+    carritoActual = [];
+    renderCarrito();
+    document.getElementById('vent-fecha').value = hoyISO();
+    const clienteInput = document.getElementById('vent-cliente');
+    clienteInput.value = '';
+    clienteInput.dataset.clienteId = '';
+    document.getElementById('vent-ciudad').value = '';
+    document.getElementById('vent-envio').value = '';
+    document.getElementById('vent-abono').value = '';
+    actualizarSaldoVenta();
+    document.getElementById('vent-submit-btn').textContent = '✅ Registrar Venta Completa';
+    document.getElementById('vent-cancel-btn').style.display = 'none';
+}
+
+function cerrarModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+function abrirModalPago(entregaId) {
+    const entrega = APP.datos.entregas.find(x => x.id === entregaId);
+    if(!entrega) return;
+    document.getElementById('modal-pago-entrega-id').value = entregaId;
+    document.getElementById('modal-pago-monto').value = '';
+    document.getElementById('modal-pago-quien').value = 'Cliente';
+    document.getElementById('modal-pago-fecha').value = hoyISO();
+    const guiaTxt = esGuiaValida(entrega.guia) ? entrega.guia : 'Sin guía';
+    document.getElementById('modal-pago-resumen').innerHTML =
+        `<strong>${entrega.cliente}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
+        `Guía: ${guiaTxt} | Empresa: ${entrega.empresa || 'Por definir'}<br>` +
+        `Total: $${entrega.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})} | ` +
+        `Abonado: $${entrega.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})} | ` +
+        `<strong style="color:#c0575c;">Saldo: $${entrega.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</strong>`;
+    document.getElementById('modal-pago').style.display = 'flex';
+}
+
+function ponerSaldoCompleto() {
+    const id = document.getElementById('modal-pago-entrega-id').value;
+    const entrega = APP.datos.entregas.find(x => x.id === id);
+    if(entrega) document.getElementById('modal-pago-monto').value = entrega.saldo;
+}
+
+async function guardarPagoModal(e) {
+    e.preventDefault();
+    const entregaId = document.getElementById('modal-pago-entrega-id').value;
+    const monto = parseFloat(document.getElementById('modal-pago-monto').value) || 0;
+    const quien = document.getElementById('modal-pago-quien').value;
+    const fecha = document.getElementById('modal-pago-fecha').value;
+    if(monto <= 0) { alert('El monto debe ser mayor a 0'); return; }
+    const entrega = APP.datos.entregas.find(x => x.id === entregaId);
+    if(!entrega) { alert('No se encontró el envío'); return; }
+
+    const nuevoAbono = entrega.abono + monto;
+    const nuevoSaldo = Math.max(0, entrega.monto - nuevoAbono);
+
+    const { data: pagoCreado, error: errPago } = await supabaseClient.from('pagos')
+        .insert({ entrega_id: entregaId, fecha, monto, quien_paga: quien }).select();
+    if(errPago) { alert('❌ Error al registrar el pago: ' + errPago.message); return; }
+
+    const { error: errEnt } = await supabaseClient.from('entregas')
+        .update({ abono: nuevoAbono, saldo: nuevoSaldo }).eq('id', entregaId);
+    if(errEnt) { alert('❌ Error al actualizar el envío: ' + errEnt.message); return; }
+
+    const venta = APP.datos.ventas.find(v => v.id === entrega.venta_id);
+    if(venta) { venta.abono = nuevoAbono; venta.saldo = nuevoSaldo; }
+
+    entrega.pagos.push(pagoCreado[0]);
+    entrega.abono = nuevoAbono;
+    entrega.saldo = nuevoSaldo;
+    cerrarModal('modal-pago');
+    APP.actualizarTodo();
+    alert('✅ Pago registrado');
+}
+
+function abrirModalGuia(entregaId) {
+    const entrega = APP.datos.entregas.find(x => x.id === entregaId);
+    if(!entrega) return;
+    document.getElementById('modal-guia-entrega-id').value = entregaId;
+    document.getElementById('modal-guia-numero').value = esGuiaValida(entrega.guia) ? entrega.guia : '';
+    document.getElementById('modal-guia-empresa').value = (entrega.empresa && entrega.empresa !== 'Por definir') ? entrega.empresa : '';
+    document.getElementById('modal-guia-resumen').innerHTML =
+        `<strong>${entrega.cliente}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
+        `Total: $${entrega.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})} | Estado: ${entrega.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}`;
+    document.getElementById('modal-guia').style.display = 'flex';
+}
+
+async function guardarGuiaModal(e) {
+    e.preventDefault();
+    const entregaId = document.getElementById('modal-guia-entrega-id').value;
+    const numero = document.getElementById('modal-guia-numero').value.trim();
+    const empresa = document.getElementById('modal-guia-empresa').value.trim();
+    if(!numero && !empresa) { alert('Ingresa al menos el número de guía o la empresa'); return; }
+    const entrega = APP.datos.entregas.find(x => x.id === entregaId);
+    if(!entrega) { alert('No se encontró el envío'); return; }
+    const cambios = {};
+    if(numero) cambios.guia = numero;
+    if(empresa) cambios.empresa = empresa;
+    const { error } = await supabaseClient.from('entregas').update(cambios).eq('id', entregaId);
+    if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
+    Object.assign(entrega, cambios);
+    cerrarModal('modal-guia');
+    APP.actualizarTodo();
+    alert('✅ Guía actualizada');
+}
+
+function actualizarListaProveedores() {
+    const dl = document.getElementById('lista-proveedores');
+    if(!dl) return;
+    const unicos = [...new Set(APP.datos.compras.map(c => c.proveedor).filter(p => p && p.trim()))].sort();
+    dl.innerHTML = unicos.map(p => `<option value="${p}"></option>`).join('');
+}
+
+function actualizarListaEmpresas() {
+    const dl = document.getElementById('lista-empresas');
+    if(!dl) return;
+    const unicos = [...new Set(APP.datos.entregas.map(e => e.empresa).filter(emp => emp && emp.trim() && emp !== 'Por definir'))].sort();
+    dl.innerHTML = unicos.map(emp => `<option value="${emp}"></option>`).join('');
+}
+
+const CIUDADES_CORREGIDAS = {
+    'bogota': 'Bogotá', 'bogotá': 'Bogotá',
+    'medellin': 'Medellín', 'cali': 'Cali', 'barranquilla': 'Barranquilla',
+    'bucaramanga': 'Bucaramanga', 'cartagena': 'Cartagena', 'cucuta': 'Cúcuta',
+    'ibague': 'Ibagué', 'pereira': 'Pereira', 'manizales': 'Manizales',
+    'santa marta': 'Santa Marta', 'villavicencio': 'Villavicencio',
+    'pasto': 'Pasto', 'monteria': 'Montería', 'neiva': 'Neiva',
+    'valledupar': 'Valledupar', 'popayan': 'Popayán', 'sincelejo': 'Sincelejo',
+    'armenia': 'Armenia', 'tunja': 'Tunja', 'quibdo': 'Quibdó',
+    'fusagasuga': 'Fusagasugá', 'tulua': 'Tuluá', 'duitama': 'Duitama',
+    'palmira': 'Palmira', 'soacha': 'Soacha', 'soledad': 'Soledad',
+    'bello': 'Bello', 'dosquebradas': 'Dosquebradas', 'cartago': 'Cartago',
+    'girardot': 'Girardot', 'rionegro': 'Rionegro', 'barrancabermeja': 'Barrancabermeja',
+    'maicao': 'Maicao', 'lorica': 'Lorica', 'magangue': 'Magangué',
+    'tumaco': 'Tumaco', 'ipiales': 'Ipiales', 'pitalito': 'Pitalito',
+    'buenaventura': 'Buenaventura', 'buga': 'Buga', 'mocoa': 'Mocoa',
+    'leticia': 'Leticia', 'yopal': 'Yopal', 'inirida': 'Inírida',
+    'saravena': 'Saravena', 'ocaña': 'Ocaña', 'pamplona': 'Pamplona',
+    'aguachica': 'Aguachica', 'zipaquira': 'Zipaquirá', 'chia': 'Chía',
+    'cajica': 'Cajicá', 'funza': 'Funza', 'mosquera': 'Mosquera',
+    'facatativa': 'Facatativá', 'tocancipa': 'Tocancipá', 'ubate': 'Ubaté',
+    'calarca': 'Calarcá', 'jamundi': 'Jamundí', 'yumbo': 'Yumbo',
+    'sabaneta': 'Sabaneta', 'barbosa': 'Barbosa', 'segovia': 'Segovia',
+    'flandes': 'Flandes', 'fresno': 'Fresno', 'mariquita': 'Mariquita',
+    'cienaga': 'Ciénaga', 'fundacion': 'Fundación', 'rioacha': 'Riohacha',
+    'riohacha': 'Riohacha', 'tame': 'Tame', 'fortul': 'Fortul',
+    'tierralta': 'Tierralta', 'sampues': 'Sampués', 'coveñas': 'Coveñas',
+    'agustin codazi': 'Agustín Codazí', 'amalfi': 'Amalfi', 'arjona': 'Arjona',
+    'ayapel': 'Ayapel', 'bahia solano': 'Bahía Solano', 'barbacoas': 'Barbacoas',
+    'boca de satinga': 'Boca de Satinga', 'bolivar': 'Bolívar',
+    'carmen de atrato': 'Carmen de Atrato', 'carmen de viboral': 'Carmen de Viboral',
+    'cartajena del chaira': 'Cartagena del Chairá', 'cerrito valle': 'Cerrito Valle',
+    'chaparrera': 'Chaparrera', 'chimichagua': 'Chimichagua', 'chinacota': 'Chinácota',
+    'chiquinquira': 'Chiquinquirá', 'cimitarra': 'Cimitarra', 'colon': 'Colón',
+    'consaca': 'Consacá', 'corinto': 'Corinto', 'darien': 'Darién',
+    'don matias': 'Don Matías', 'el copey': 'El Copey', 'engativa': 'Engativá',
+    'fomeque': 'Fómeque', 'fonseca': 'Fonseca', 'frontino': 'Frontino',
+    'guaranda': 'Guaranda', 'huila': 'Huila', 'isnos': 'Isnos',
+    'itsmina': 'Istmina', 'la ceja': 'La Ceja', 'la dorada': 'La Dorada',
+    'la plata': 'La Plata', 'llorente': 'Llorente', 'loma de arena': 'Loma de Arena',
+    'los patios': 'Los Patios', 'madrid': 'Madrid', 'maria la baja': 'María La Baja',
+    'nepomuceno': 'San Juan Nepomuceno', 'oporapa': 'Oporapa',
+    'pie de cuesta': 'Piedecuesta', 'puerto boyaca': 'Puerto Boyacá',
+    'puerto asis': 'Puerto Asís', 'puerto parra': 'Puerto Parra',
+    'putumayo': 'Putumayo', 'risaralda': 'Risaralda',
+    'saladoblanco': 'Saladoblanco', 'saldaña': 'Saldaña',
+    'san alberto': 'San Alberto', 'san anonio': 'San Antonio', 'san antonio': 'San Antonio',
+    'san francisco': 'San Francisco', 'san gil': 'San Gil',
+    'san jacinto': 'San Jacinto', 'san onofre': 'San Onofre',
+    'san pelayo': 'San Pelayo', 'san juan de uraba': 'San Juan de Urabá',
+    'san martin': 'San Martín', 'santa rosa de cabal': 'Santa Rosa de Cabal',
+    'santa rosa de osos': 'Santa Rosa de Osos', 'santander': 'Santander',
+    'santuario': 'Santuario', 'sesquile': 'Sesquilé', 'silvania': 'Silvania',
+    'suarez': 'Suárez', 'taraza': 'Tarazá', 'teruel': 'Teruel',
+    'toledo': 'Toledo', 'urumita': 'Urumita', 'vegachi': 'Vegachí',
+    'villa de leiva': 'Villa de Leyva', 'villa del rasario': 'Villa del Rosario',
+    'villa del rosario': 'Villa del Rosario', 'villa gorgona': 'Villa Gorgona',
+    'yarumal': 'Yarumal', 'yondo': 'Yondó', 'zaragoza': 'Zaragoza',
+    'aguadedios': 'Agua de Dios',
+};
+
+function normalizarCiudad(ciudad) {
+    if(!ciudad) return '';
+    const clave = ciudad.trim().toLowerCase();
+    return CIUDADES_CORREGIDAS[clave] || ciudad.trim();
+}
+
+function obtenerCiudadesUnicas() {
+    const todas = APP.datos.ventas.map(v => normalizarCiudad(v.ciudad)).filter(c => c && c !== '-');
+    return [...new Set(todas)].sort((a, b) => a.localeCompare(b, 'es'));
+}
+
+function inicializarAutocompleteCiudad(inputId, listaId) {
+    const input = document.getElementById(inputId);
+    const lista = document.getElementById(listaId);
+    if(!input || !lista) return;
+
+    const ocultar = () => { lista.style.display = 'none'; lista.innerHTML = ''; };
+
+    const elegir = (ciudad) => {
+        input.value = ciudad;
+        ocultar();
+        sugerirAbono();
+    };
+
+    const filtrar = () => {
+        const q = input.value.trim().toLowerCase();
+        const ciudades = obtenerCiudadesUnicas();
+        if(!q) {
+            lista.innerHTML = ciudades.map(c =>
+                `<div class="autocomplete-item" data-ciudad="${c.replace(/"/g, '&quot;')}">${c}</div>`
+            ).join('');
+            lista.style.display = ciudades.length ? 'block' : 'none';
+            return;
+        }
+        const coincidencias = ciudades.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
+        if(coincidencias.length === 0) { ocultar(); return; }
+        lista.innerHTML = coincidencias.map(c =>
+            `<div class="autocomplete-item" data-ciudad="${c.replace(/"/g, '&quot;')}">${c}</div>`
+        ).join('');
+        lista.style.display = 'block';
+    };
+
+    input.addEventListener('input', filtrar);
+    input.addEventListener('focus', filtrar);
+    input.addEventListener('blur', () => setTimeout(ocultar, 150));
+    input.addEventListener('keydown', e => {
+        if(e.key === 'Enter' && lista.style.display === 'block' && lista.firstChild) {
+            e.preventDefault();
+            elegir(lista.firstChild.getAttribute('data-ciudad'));
+        } else if(e.key === 'Escape') {
+            ocultar();
+        }
+    });
+    lista.addEventListener('mousedown', e => {
+        const item = e.target.closest('.autocomplete-item');
+        if(item) elegir(item.getAttribute('data-ciudad'));
+    });
+}
+
+function esGuiaValida(guia) {
+    return !!(guia && !guia.startsWith('ENVIO') && !guia.startsWith('AUTO'));
+}
+
+
+function importarDatosExcel() {
+    // Desde que los datos viven en Supabase, la carga masiva del Excel se
+    // hace con migrar_a_supabase.py (más rápido y ya probado con los datos
+    // reales del negocio) en vez de subir el JSON crudo aquí en el
+    // navegador fila por fila. Este botón se deja como referencia de dónde
+    // ejecutar ese paso si algún día hace falta recargar el histórico.
+    alert('Para cargar datos masivos del Excel a Supabase, usa el script "migrar_a_supabase.py" (ver instrucciones en el archivo). Este botón del navegador ya no se usa para esa tarea, para no duplicar cientos de operaciones una por una en el navegador.');
+}
+
+function exportarJSON() {
+    const datos = {
+        productos: APP.datos.productos,
+        compras: APP.datos.compras,
+        ventas: APP.datos.ventas,
+        entregas: APP.datos.entregas,
+        fechaExportacion: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(datos, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `paupelus_respaldo_${hoyISO()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function limpiarTodo() {
+    if(!confirm('⚠️ ¿Estás SEGURA de borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+    if(!confirm('Última confirmación: se perderán productos, clientes, compras, ventas y entregas de Supabase. ¿Continuar?')) return;
+    const NIL = '00000000-0000-0000-0000-000000000000';
+    // Orden de borrado respetando las relaciones (hijos primero).
+    for(const tabla of ['pagos', 'entregas', 'venta_items', 'ventas', 'compras', 'productos', 'clientes']) {
+        const { error } = await supabaseClient.from(tabla).delete().neq('id', NIL);
+        if(error) { alert(`❌ Error al borrar "${tabla}": ` + error.message); return; }
+    }
+    APP.datos.productos = [];
+    APP.datos.clientes = [];
+    APP.datos.compras = [];
+    APP.datos.ventas = [];
+    APP.datos.entregas = [];
+    APP.actualizarTodo();
+    actualizarEstadoDatos();
+    alert('Datos borrados');
+}
+
+function actualizarEstadoDatos() {
+    const el = document.getElementById('datos-estado');
+    if(el) {
+        el.textContent = `${APP.datos.productos.length} productos, ${APP.datos.compras.length} compras, ${APP.datos.ventas.length} ventas, ${APP.datos.entregas.length} entregas`;
+    }
+}
+
+function rangoRapido(dias) {
+    const hasta = new Date();
+    const desde = new Date();
+    desde.setDate(desde.getDate() - dias + 1);
+    document.getElementById('rep-desde').value = aISOLocal(desde);
+    document.getElementById('rep-hasta').value = aISOLocal(hasta);
+    generarReporteFechas();
+}
+
+function generarReporteFechas() {
+    const desdeStr = document.getElementById('rep-desde').value;
+    const hastaStr = document.getElementById('rep-hasta').value;
+    if(!desdeStr || !hastaStr) { alert('Selecciona ambas fechas'); return; }
+    const desde = parsearFechaLocal(desdeStr);
+    const hasta = parsearFechaLocal(hastaStr);
+    hasta.setHours(23, 59, 59, 999);
+
+    const filtradas = APP.datos.ventas.filter(v => {
+        const f = parsearFechaLocal(v.fecha);
+        return f >= desde && f <= hasta;
+    }).sort((a, b) => parsearFechaLocal(a.fecha) - parsearFechaLocal(b.fecha));
+
+    const tbody = document.getElementById('tabla-reporte-fechas');
+    tbody.innerHTML = '';
+
+    let totCant = 0, totCosto = 0, totVenta = 0, totEnvio = 0, totUtilidad = 0;
+    const filas = [];
+
+    // Cada venta puede tener varios productos (factura); se muestra una fila
+    // por producto, pero el costo de envío de la factura solo se suma una vez
+    // (en la primera línea) para que los totales no queden duplicados.
+    filtradas.forEach(v => {
+        const items = itemsDeVenta(v);
+        items.forEach((it, idx) => {
+            const prod = APP.datos.productos.find(p => p.ref === it.ref);
+            const subtotal = it.subtotal !== undefined ? it.subtotal : (it.cantidad || 0) * (it.precio || 0);
+            const costoItem = it.costo_total || 0;
+            const envioItem = idx === 0 ? (v.costo_envio || 0) : 0;
+            const utilidadItem = subtotal - costoItem - envioItem;
+
+            totCant += it.cantidad || 0;
+            totCosto += costoItem;
+            totVenta += subtotal;
+            totEnvio += envioItem;
+            totUtilidad += utilidadItem;
+
+            filas.push({
+                numero: v.numero, fecha: v.fecha, ref: it.ref,
+                nombre: it.nombre || (prod ? prod.nombre : ''),
+                cantidad: it.cantidad, costo: costoItem, venta: subtotal, envio: envioItem, utilidad: utilidadItem
+            });
+
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td><strong>${it.ref}</strong></td><td>${it.nombre || (prod ? prod.nombre : '-')}</td><td>${it.cantidad}</td><td>$${costoItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envioItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidadItem>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidadItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+            tbody.appendChild(fila);
+        });
+    });
+
+    if(filas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">No hay ventas en ese rango de fechas</td></tr>';
+    }
+
+    document.getElementById('rep-fechas-cant').textContent = totCant;
+    document.getElementById('rep-fechas-costo').textContent = '$' + totCosto.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('rep-fechas-venta').textContent = '$' + totVenta.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('rep-fechas-envio').textContent = '$' + totEnvio.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('rep-fechas-utilidad').textContent = '$' + totUtilidad.toLocaleString('es-CO', {maximumFractionDigits: 0});
+
+    window._ultimoReporteFechas = filas;
+}
+
+function exportarReporteCSV() {
+    const filas = window._ultimoReporteFechas || [];
+    if(filas.length === 0) { alert('Genera un reporte primero'); return; }
+    let csv = 'N Venta,Fecha,Referencia,Nombre,Cantidad,Costo,Venta,Costo Envio,Utilidad\n';
+    filas.forEach(f => {
+        csv += `${f.numero || ''},${f.fecha},${f.ref},"${f.nombre || ''}",${f.cantidad},${f.costo},${f.venta},${f.envio},${f.utilidad}\n`;
+    });
+    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_ventas_${document.getElementById('rep-desde').value}_a_${document.getElementById('rep-hasta').value}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportarInventarioCSV() {
+    const filas = APP._inventarioCache || APP.calcularInventario();
+    if(filas.length === 0) { alert('No hay inventario para exportar'); return; }
+    let csv = 'Referencia,Nombre,Costo Unitario,Cantidad,Valor Total\n';
+    filas.forEach(f => {
+        csv += `${f.ref},"${f.nombre || ''}",${Math.round(f.costoUnitario)},${f.cantidad},${Math.round(f.valorTotal)}\n`;
+    });
+    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventario_${hoyISO()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function cambiarTab(e, tabId) {
+    e.preventDefault();
+    const contenedor = e.target.closest('.section') || document;
+    contenedor.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    contenedor.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    e.target.classList.add('active');
+}
+
+// ===== FILTROS POR COLUMNA =====
+// Inserta una fila de cajas de búsqueda bajo los encabezados de cada tabla
+// y filtra las filas mostrando solo las que coinciden en TODAS las columnas
+// con texto escrito. Funciona sobre el texto ya renderizado, así que sirve
+// igual para fechas formateadas, montos con $ y puntos, nombres, etc.
+const TABLAS_CON_FILTRO = [
+    { tbody: 'tabla-productos', omitir: ['Acciones'] },
+    { tbody: 'tabla-compras', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas-envios', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas-cobro', omitir: ['Acciones'] },
+    { tbody: 'tabla-entregas', omitir: ['Acciones'] },
+    { tbody: 'tabla-inventario', omitir: [] },
+    { tbody: 'tabla-reporte-fechas', omitir: [] },
+    { tbody: 'tabla-top', omitir: [] },
+    { tbody: 'tabla-empresas', omitir: [] },
+];
+
+function aplicarFiltrosTabla(tbody) {
+    const tabla = tbody.closest('table');
+    const filaFiltros = tabla.querySelector('tr.fila-filtros');
+    if(!filaFiltros) return;
+    const filtros = Array.from(filaFiltros.querySelectorAll('input')).map(i => i.value.trim().toLowerCase());
+
+    let visibles = 0;
+    Array.from(tbody.rows).forEach(fila => {
+        if(fila.classList.contains('sin-resultados-filtro')) return;
+        // Filas de mensaje ("Sin productos...") tienen un colspan: no se filtran.
+        if(fila.cells.length < filtros.length) { fila.style.display = ''; visibles++; return; }
+        const coincide = filtros.every((f, idx) => {
+            if(!f) return true;
+            const celda = fila.cells[idx];
+            return celda && celda.textContent.toLowerCase().includes(f);
+        });
+        fila.style.display = coincide ? '' : 'none';
+        if(coincide) visibles++;
+    });
+
+    let avisoVacio = tbody.querySelector('tr.sin-resultados-filtro');
+    const hayFiltroActivo = filtros.some(f => f);
+    if(visibles === 0 && hayFiltroActivo) {
+        if(!avisoVacio) {
+            avisoVacio = document.createElement('tr');
+            avisoVacio.className = 'sin-resultados-filtro';
+            avisoVacio.innerHTML = `<td colspan="${filtros.length + 1}">Ningún registro coincide con el filtro</td>`;
+            tbody.appendChild(avisoVacio);
+        }
+        avisoVacio.style.display = '';
+    } else if(avisoVacio) {
+        avisoVacio.style.display = 'none';
+    }
+}
+
+function construirFilaFiltros(config) {
+    const tbody = document.getElementById(config.tbody);
+    if(!tbody) return;
+    const tabla = tbody.closest('table');
+    const thead = tabla.querySelector('thead');
+    if(!thead || thead.querySelector('tr.fila-filtros')) return;
+
+    const encabezados = Array.from(thead.rows[0].cells);
+    const fila = document.createElement('tr');
+    fila.className = 'fila-filtros';
+    encabezados.forEach(th => {
+        const celda = document.createElement('th');
+        const titulo = th.textContent.trim();
+        if(titulo && !config.omitir.includes(titulo)) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'filtro-col';
+            input.placeholder = 'Filtrar…';
+            input.addEventListener('input', () => aplicarFiltrosTabla(tbody));
+            celda.appendChild(input);
+        }
+        fila.appendChild(celda);
+    });
+    thead.appendChild(fila);
+
+    // Cada vez que la app repinta la tabla se pierden los display:none, así
+    // que se vuelve a aplicar el filtro vigente sobre las filas nuevas.
+    new MutationObserver(() => aplicarFiltrosTabla(tbody))
+        .observe(tbody, { childList: true });
+}
+
+function inicializarFiltrosTablas() {
+    TABLAS_CON_FILTRO.forEach(construirFilaFiltros);
+}
+    </script>
+</body>
+</html>

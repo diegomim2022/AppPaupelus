@@ -1,0 +1,154 @@
+🎀 PAU PELUS BEAUTY - GESTIÓN DE INVENTARIO
+========================================
+
+INICIO RÁPIDO EN 3 PASOS:
+
+1️⃣  ABRE LA APLICACIÓN
+   - Haz doble clic en "index.html"
+   - Se abrirá en tu navegador (Chrome, Firefox, Safari, Edge)
+   - ¡Listo! La aplicación está cargada
+
+2️⃣  ESTRUCTURA BÁSICA
+   Dashboard      → Ve tus ventas, compras, utilidades
+   Productos      → Registra tus pelucas con referencias
+   Compras        → Documenta tus pedidos desde China
+   Ventas         → Anota cada venta realizada
+   Reportes       → Análisis detallado de tu negocio
+   Datos          → Respaldos y exportaciones
+
+3️⃣  FLUJO DE TRABAJO RECOMENDADO
+   A) Primero: Crea tus PRODUCTOS (referencias)
+   B) Luego:   Registra tus COMPRAS
+   C) Después: Anota tus VENTAS
+   D) Finalmente: Revisa el DASHBOARD y REPORTES
+
+========================================
+
+DATOS IMPORTANTES:
+
+✅ ALMACENAMIENTO
+   - Todo se guarda en tu navegador (LocalStorage)
+   - No se envía a ningún servidor
+   - No necesitas internet para usar la app
+   - Los datos se guardan automáticamente
+
+✅ PORTABILIDAD
+   - Copia index.html a cualquier computador
+   - Abre en el navegador
+   - ¡Funciona en cualquier lugar!
+
+✅ RESPALDOS
+   - Ve a la sección "Datos"
+   - Usa "Descargar como JSON" una vez a la semana
+   - Guarda el archivo en un lugar seguro
+
+========================================
+
+REFERENCIAS DE EJEMPLOS:
+
+CATEGORÍAS:
+- Gomas (protecciones de pantalla)
+- Vidrios (cristales protectores)
+- Accesorios (cables, adaptadores)
+- Pelucas (productos principales)
+
+PROVEEDORES CHINOS:
+- Jack
+- Seven
+- Aurora
+- Bodeux
+- Jimmy
+- NickyJack
+
+EMPRESAS DE ENVÍO:
+- DHL
+- FedEx
+- Correos
+- Fedex
+
+CONVERSIÓN AUTOMÁTICA:
+- Costo RMB × Cantidad × Tasa (430) + Transporte = Costo Total
+
+========================================
+
+FÓRMULAS INTERNAS:
+
+Stock = Cantidad Comprada - Cantidad Vendida
+Utilidad Total = Total Ventas - Total Compras
+Margen = (Utilidad / Total Ventas) × 100%
+
+========================================
+
+PREGUNTAS FRECUENTES:
+
+❓ ¿Dónde se guardan mis datos?
+✅ En el navegador, en LocalStorage. Nunca en internet.
+
+❓ ¿Qué pasa si borro el caché?
+⚠️  Se pierden los datos. Respáldalos exportando.
+
+❓ ¿Puedo usar esto en mi teléfono?
+✅ Sí, pero funciona mejor en computadora. Abre index.html en Chrome.
+
+❓ ¿Puedo cambiar la tasa de cambio?
+✅ Sí, en Compras hay un campo "Tasa de Cambio" (por defecto 430).
+
+❓ ¿Cómo exporto los datos?
+✅ Ve a Datos → Descargar como JSON (recomendado)
+
+❓ ¿Puedo importar datos de Excel?
+✅ Exporta tu Excel a JSON, luego importa en la app.
+
+========================================
+
+RECOMENDACIONES:
+
+1. Usa referencias CONSISTENTES para los productos
+   Ejemplo: Siempre usa "1363-J5P", nunca "1363-J5P2" o "1363 J5P"
+
+2. Exporta tus datos CADA SEMANA
+   En caso de emergencia, siempre tendrás un respaldo
+
+3. Actualiza la tasa de cambio si RMB a Pesos cambia mucho
+
+4. Revisa los reportes MENSUALMENTE
+   Identifica qué productos venden más
+
+5. Usa la búsqueda para encontrar productos rápidamente
+   Barra de búsqueda en cada sección
+
+========================================
+
+ARCHIVOS EN LA CARPETA:
+
+📄 index.html       → La aplicación (¡ABRE ESTO!)
+📄 README.md        → Manual completo
+📄 INICIO_RÁPIDO.txt → Este archivo
+
+========================================
+
+¿NECESITAS AYUDA?
+
+Si la aplicación no carga:
+1. Verifica que estés abriendo index.html (no README.md)
+2. Intenta con otro navegador (Chrome recomendado)
+3. Borra el caché del navegador y reinicia
+
+Si perdiste datos:
+1. Revisa si tienes un respaldo exportado
+2. Importa desde el archivo respaldado
+
+========================================
+
+¡LISTO PARA EMPEZAR! 🚀
+
+Abre index.html en tu navegador y comienza a registrar:
+1. Tus productos
+2. Tus compras
+3. Tus ventas
+4. ¡Mira tu Dashboard crecer! 📊
+
+========================================
+
+Pau Pelus Beauty © 2026
+Aplicación de Gestión de Inventario - Funciona Completamente Offline

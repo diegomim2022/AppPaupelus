@@ -1,0 +1,15 @@
+# Datos sensibles y archivos grandes
+migrar_a_supabase.py
+paupelus_datos.json
+paupelus_datos_completo.json
+paupelus_respaldo_*.json
+*.xlsm
+*.csv
+
+# Scripts de desarrollo (no necesarios para la app)
+extraer_datos.py
+analizar_xlsm.py
+generar_app.py
+
+# Claude Code
+.claude/
