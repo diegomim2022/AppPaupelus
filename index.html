@@ -248,6 +248,34 @@
             <!-- COMPRAS -->
             <div id="compras" class="section">
                 <h2>🛒 Registro de Compras</h2>
+
+                <h3>1. Agrega los productos de esta compra</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Referencia/Producto</label>
+                        <input type="text" id="comp-ref" placeholder="Escribe la referencia o el nombre..." autocomplete="off">
+                        <div class="autocomplete-list" id="comp-ref-list"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" id="comp-cant" placeholder="1" step="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Costo Unitario (Pesos)</label>
+                        <input type="number" id="comp-costo" placeholder="0" step="100">
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;">
+                        <button type="button" class="btn" onclick="agregarItemCompra()">+ Agregar Producto</button>
+                    </div>
+                </div>
+
+                <table>
+                    <thead><tr><th>Referencia</th><th>Nombre</th><th>Cantidad</th><th>Costo Unit.</th><th>Subtotal</th><th>Costo</th><th></th></tr></thead>
+                    <tbody id="carrito-compra-body"></tbody>
+                    <tfoot><tr><td colspan="4"><strong>TOTAL DE LA COMPRA</strong></td><td id="carrito-compra-total">$0</td><td id="carrito-compra-costo">$0</td><td></td></tr></tfoot>
+                </table>
+
+                <h3>2. Datos de la compra</h3>
                 <form onsubmit="agregarCompra(event)">
                     <input type="hidden" id="comp-edit-id" value="">
                     <div class="form-row">
@@ -260,22 +288,7 @@
                             <input type="text" id="comp-prov" required placeholder="Escribe el nombre del proveedor" list="lista-proveedores" autocomplete="off">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Referencia/Producto *</label>
-                            <input type="text" id="comp-ref" required placeholder="Escribe la referencia o el nombre..." autocomplete="off">
-                            <div class="autocomplete-list" id="comp-ref-list"></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Cantidad *</label>
-                            <input type="number" id="comp-cant" required placeholder="0" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>Costo Unitario (Pesos) *</label>
-                            <input type="number" id="comp-costo" required placeholder="0" step="100">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn" id="comp-submit-btn">➕ Registrar Compra</button>
+                    <button type="submit" class="btn" id="comp-submit-btn">✅ Registrar Compra Completa</button>
                     <button type="button" class="btn" id="comp-cancel-btn" style="display:none; background:#aaa;" onclick="cancelarEdicionCompra()">✖️ Cancelar</button>
                 </form>
 
@@ -371,7 +384,7 @@
                         <div class="form-group">
                             <label>Ciudad</label>
                             <div style="position:relative;">
-                                <input type="text" id="vent-ciudad" placeholder="Bogotá, Cali, etc" autocomplete="off" onblur="sugerirAbono()">
+                                <input type="text" id="vent-ciudad" placeholder="Bogotá, Cali, etc" autocomplete="off" onblur="sugerirEnvio()">
                                 <div class="autocomplete-list" id="vent-ciudad-list"></div>
                             </div>
                         </div>
@@ -1286,25 +1299,59 @@ function cancelarEdicionProducto() {
     document.getElementById('prod-cancel-btn').style.display = 'none';
 }
 
-async function agregarCompra(e) {
-    e.preventDefault();
-    const fecha = document.getElementById('comp-fecha').value;
-    const prov = document.getElementById('comp-prov').value.trim();
+let carritoCompra = [];
+
+function agregarItemCompra() {
     const refInput = document.getElementById('comp-ref');
     const ref = refInput.value.trim();
     const cant = parseInt(document.getElementById('comp-cant').value) || 0;
     const costo = parseFloat(document.getElementById('comp-costo').value) || 0;
-    if(!fecha || !prov || !ref || cant <= 0 || costo <= 0) { alert('Completa los campos'); return; }
+    if(!ref || cant <= 0 || costo <= 0) { alert('Completa referencia, cantidad y costo'); return; }
 
-    const nombreSeleccionado = refInput.dataset.nombreSeleccionado;
     const prod = APP.datos.productos.find(p => p.ref === ref);
-    const nombre = nombreSeleccionado || (prod ? prod.nombre : '');
-
     if(!prod) { alert('❌ Esa referencia no existe en Productos. Créala primero en el módulo Productos.'); return; }
+
+    const nombre = refInput.dataset.nombreSeleccionado || prod.nombre || '';
+    carritoCompra.push({ ref, nombre, cantidad: cant, costo_unitario: costo, costo_total: cant * costo });
+
+    refInput.value = '';
+    refInput.dataset.nombreSeleccionado = '';
+    document.getElementById('comp-cant').value = '1';
+    document.getElementById('comp-costo').value = '';
+    refInput.focus();
+    renderCarritoCompra();
+}
+
+function quitarItemCompra(idx) {
+    carritoCompra.splice(idx, 1);
+    renderCarritoCompra();
+}
+
+function renderCarritoCompra() {
+    const tbody = document.getElementById('carrito-compra-body');
+    if(!carritoCompra.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;">Sin productos agregados aún</td></tr>';
+    } else {
+        tbody.innerHTML = carritoCompra.map((it, i) =>
+            `<tr><td><strong>${esc(it.ref)}</strong></td><td>${esc(it.nombre)}</td><td>${it.cantidad}</td><td>$${it.costo_unitario.toLocaleString('es-CO')}</td><td>$${it.costo_total.toLocaleString('es-CO')}</td><td></td><td><button class="btn" style="background:#c0575c;padding:4px 10px;" onclick="quitarItemCompra(${i})">✕</button></td></tr>`
+        ).join('');
+    }
+    const total = carritoCompra.reduce((s, it) => s + it.costo_total, 0);
+    document.getElementById('carrito-compra-total').textContent = '$' + total.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('carrito-compra-costo').textContent = '$' + total.toLocaleString('es-CO', {maximumFractionDigits: 0});
+}
+
+async function agregarCompra(e) {
+    e.preventDefault();
+    const fecha = document.getElementById('comp-fecha').value;
+    const prov = document.getElementById('comp-prov').value.trim();
+    if(!fecha || !prov) { alert('Completa fecha y proveedor'); return; }
 
     const editId = document.getElementById('comp-edit-id').value;
     if(editId) {
-        const cambios = { fecha, proveedor: prov, ref, nombre: nombre || '', cantidad: cant, costo_unitario: costo, costo_total: cant * costo };
+        if(carritoCompra.length !== 1) { alert('En modo edición solo se permite un producto'); return; }
+        const it = carritoCompra[0];
+        const cambios = { fecha, proveedor: prov, ref: it.ref, nombre: it.nombre, cantidad: it.cantidad, costo_unitario: it.costo_unitario, costo_total: it.costo_total };
         const { error } = await supabaseClient.from('compras').update(cambios).eq('id', editId);
         if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
         const c = APP.datos.compras.find(x => x.id === editId);
@@ -1312,15 +1359,20 @@ async function agregarCompra(e) {
         cancelarEdicionCompra();
         alert('✅ Compra actualizada');
     } else {
-        const nuevo = { fecha, proveedor: prov, ref, nombre, cantidad: cant, costo_unitario: costo, costo_total: cant * costo };
-        const { data, error } = await supabaseClient.from('compras').insert(nuevo).select();
+        if(carritoCompra.length === 0) { alert('Agrega al menos un producto a la compra'); return; }
+        const registros = carritoCompra.map(it => ({
+            fecha, proveedor: prov, ref: it.ref, nombre: it.nombre,
+            cantidad: it.cantidad, costo_unitario: it.costo_unitario, costo_total: it.costo_total
+        }));
+        const { data, error } = await supabaseClient.from('compras').insert(registros).select();
         if(error) { alert('❌ Error al registrar: ' + error.message); return; }
-        APP.datos.compras.push(data[0]);
+        data.forEach(d => APP.datos.compras.push(d));
+        carritoCompra = [];
+        renderCarritoCompra();
         e.target.reset();
         document.getElementById('comp-fecha').value = hoyISO();
-        alert('✅ Compra registrada');
+        alert('✅ Compra registrada (' + data.length + ' productos)');
     }
-    refInput.dataset.nombreSeleccionado = '';
     APP.actualizarTodo();
 }
 
@@ -1330,11 +1382,8 @@ function editarCompra(id) {
     document.getElementById('comp-edit-id').value = id;
     document.getElementById('comp-fecha').value = c.fecha;
     document.getElementById('comp-prov').value = c.proveedor || '';
-    const refInput = document.getElementById('comp-ref');
-    refInput.value = c.ref;
-    refInput.dataset.nombreSeleccionado = c.nombre || '';
-    document.getElementById('comp-cant').value = c.cantidad;
-    document.getElementById('comp-costo').value = c.costo_unitario;
+    carritoCompra = [{ ref: c.ref, nombre: c.nombre || '', cantidad: c.cantidad, costo_unitario: c.costo_unitario, costo_total: c.costo_total }];
+    renderCarritoCompra();
     document.getElementById('comp-submit-btn').textContent = '💾 Guardar Cambios';
     document.getElementById('comp-cancel-btn').style.display = 'inline-block';
     document.getElementById('comp-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -1344,7 +1393,9 @@ function cancelarEdicionCompra() {
     document.getElementById('comp-edit-id').value = '';
     document.querySelector('#compras form').reset();
     document.getElementById('comp-fecha').value = hoyISO();
-    document.getElementById('comp-submit-btn').textContent = '➕ Registrar Compra';
+    carritoCompra = [];
+    renderCarritoCompra();
+    document.getElementById('comp-submit-btn').textContent = '✅ Registrar Compra Completa';
     document.getElementById('comp-cancel-btn').style.display = 'none';
 }
 
@@ -1772,13 +1823,13 @@ function actualizarSaldoVenta() {
     el.style.color = saldo > 0 ? '#c0575c' : '#2e7d5c';
 }
 
-function sugerirAbono() {
-    const abonoField = document.getElementById('vent-abono');
-    if(abonoField.value) return;
+function sugerirEnvio() {
+    const envioField = document.getElementById('vent-envio');
+    if(envioField.value) return;
     const ciudad = document.getElementById('vent-ciudad').value.trim().toLowerCase();
+    if(!ciudad) return;
     const esBogota = ciudad === 'bogota' || ciudad === 'bogotá';
-    abonoField.value = esBogota ? 10000 : 25000;
-    actualizarSaldoVenta();
+    envioField.value = esBogota ? 10000 : 25000;
 }
 
 async function agregarVenta(e) {
@@ -2112,7 +2163,7 @@ function inicializarAutocompleteCiudad(inputId, listaId) {
     const elegir = (ciudad) => {
         input.value = ciudad;
         ocultar();
-        sugerirAbono();
+        sugerirEnvio();
     };
 
     const filtrar = () => {
