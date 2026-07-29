@@ -780,7 +780,12 @@ async function iniciarSesion(e) {
     btn.disabled = false;
     btn.textContent = 'Entrar';
     if(error) {
-        errorEl.textContent = 'Correo o contraseña incorrectos.';
+        const emsg = error.message || '';
+        if(emsg.includes('JWT') || emsg.includes('token') || emsg.includes('clock')) {
+            errorEl.textContent = 'El reloj de este computador está desconfigurado. Ve a Configuración > Hora e idioma y activa "Establecer la hora automáticamente", luego recarga la página.';
+        } else {
+            errorEl.textContent = 'Correo o contraseña incorrectos.';
+        }
         errorEl.style.display = 'block';
         return false;
     }
@@ -859,7 +864,14 @@ const APP = {
             return true;
         } catch(x) {
             console.error(x);
-            alert('⚠️ No se pudieron cargar los datos desde Supabase. Revisa tu conexión a internet y vuelve a intentar. (' + (x.message || x) + ')');
+            const msg = x.message || String(x);
+            if(msg.includes('JWT') || msg.includes('token') || msg.includes('expired')) {
+                alert('⚠️ Tu sesión expiró o el reloj de este computador está desconfigurado.\n\nSolución:\n1. Ve a Configuración > Hora e idioma > Fecha y hora\n2. Activa "Establecer la hora automáticamente"\n3. Haz clic en "Sincronizar ahora"\n4. Recarga esta página');
+                await supabaseClient.auth.signOut();
+                location.reload();
+            } else {
+                alert('⚠️ No se pudieron cargar los datos desde Supabase. Revisa tu conexión a internet y vuelve a intentar. (' + msg + ')');
+            }
             return false;
         }
     },
