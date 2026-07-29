@@ -673,7 +673,6 @@
                         <label>Selecciona el archivo paupelus_datos_completo.json</label>
                         <input type="file" id="datos-input-file" accept=".json">
                     </div>
-                    <button class="btn" onclick="importarDatosExcel()">📥 Importar Datos del Excel</button>
                 </form>
 
                 <h3>📤 Exportar / Respaldar</h3>
@@ -865,9 +864,7 @@ const APP = {
         }
     },
 
-    generarId() {
-        return Math.random().toString(36).slice(2, 11);
-    },
+
 
     conectarEventos() {
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1005,7 +1002,7 @@ const APP = {
             const alerta = f.sobrevendido > 0
                 ? ` <span style="color:#c0575c; font-size:11px;" title="Se vendieron más unidades de las compradas">⚠ ${f.sobrevendido} sin respaldo de compra</span>`
                 : '';
-            return `<tr><td><strong>${f.ref}</strong>${alerta}</td><td>${f.nombre}</td><td>$${Math.round(f.costoUnitario).toLocaleString('es-CO')}</td><td>${f.cantidad}</td><td>$${Math.round(f.valorTotal).toLocaleString('es-CO')}</td></tr>`;
+            return `<tr><td><strong>${esc(f.ref)}</strong>${alerta}</td><td>${esc(f.nombre)}</td><td>$${Math.round(f.costoUnitario).toLocaleString('es-CO')}</td><td>${f.cantidad}</td><td>$${Math.round(f.valorTotal).toLocaleString('es-CO')}</td></tr>`;
         }).join('');
         if(filas.length === 0) tabla.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Sin stock disponible</td></tr>';
 
@@ -1026,7 +1023,7 @@ const APP = {
         tabla.innerHTML = '';
         this.datos.productos.forEach(p => {
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${p.ref}</strong></td><td>${p.nombre}</td><td>${p.color || '-'}</td><td>${p.longitud || '-'}</td><td>${p.tipo || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${p.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${p.id}')">🗑️</button></td>`;
+            fila.innerHTML = `<td><strong>${esc(p.ref)}</strong></td><td>${esc(p.nombre)}</td><td>${esc(p.color) || '-'}</td><td>${esc(p.longitud) || '-'}</td><td>${esc(p.tipo) || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${esc(p.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${esc(p.id)}')">🗑️</button></td>`;
             tabla.appendChild(fila);
         });
         if(this.datos.productos.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin productos. ¡Agrega uno!</td></tr>';
@@ -1040,7 +1037,7 @@ const APP = {
             const prod = this.datos.productos.find(p => p.ref === c.ref);
             const nombreMostrar = c.nombre || (prod ? prod.nombre : '-');
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td>${formatearFecha(c.fecha)}</td><td>${c.proveedor || '-'}</td><td>${nombreMostrar}</td><td><strong>${c.ref}</strong></td><td>${c.cantidad}</td><td>$${c.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarCompra('${c.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarCompra('${c.id}')">🗑️</button></td>`;
+            fila.innerHTML = `<td>${formatearFecha(c.fecha)}</td><td>${esc(c.proveedor) || '-'}</td><td>${esc(nombreMostrar)}</td><td><strong>${esc(c.ref)}</strong></td><td>${c.cantidad}</td><td>$${c.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarCompra('${esc(c.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarCompra('${esc(c.id)}')">🗑️</button></td>`;
             tabla.appendChild(fila);
         });
         if(this.datos.compras.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin compras registradas</td></tr>';
@@ -1077,7 +1074,7 @@ const APP = {
             const guiaAsignada = esGuiaValida(e.guia) ? e.guia : 'Sin asignar';
             const estadoClass = e.saldo === 0 ? 'color:#2e7d5c;font-weight:bold;' : 'color:#c0575c;';
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${guiaAsignada}</strong></td><td>${e.cliente}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${e.empresa || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${e.id}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${e.id}')" title="Asignar guía">🏷️</button></td>`;
+            fila.innerHTML = `<td><strong>${esc(guiaAsignada)}</strong></td><td>${esc(e.cliente)}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(e.empresa) || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${esc(e.id)}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${esc(e.id)}')" title="Asignar guía">🏷️</button></td>`;
             tabla.appendChild(fila);
         });
         if(this.datos.entregas.length === 0) tabla.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">Sin entregas registradas</td></tr>';
@@ -1138,7 +1135,7 @@ const APP = {
 
         ops.forEach(op => {
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td>${op.tipo}</td><td>${formatearFecha(op.fecha)}</td><td>${op.desc}</td><td>$${op.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+            fila.innerHTML = `<td>${esc(op.tipo)}</td><td>${formatearFecha(op.fecha)}</td><td>${esc(op.desc)}</td><td>$${op.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
             ultimas.appendChild(fila);
         });
 
@@ -1175,7 +1172,7 @@ const APP = {
         Object.entries(top).sort((a, b) => b[1].cant - a[1].cant).slice(0, 10).forEach(([ref, dados]) => {
             const prod = this.datos.productos.find(p => p.ref === ref);
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${ref}</strong></td><td>${prod ? prod.nombre : '-'}</td><td>${dados.cant}</td><td>$${dados.ingr.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.ingr - dados.costo).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+            fila.innerHTML = `<td><strong>${esc(ref)}</strong></td><td>${esc(prod ? prod.nombre : '-')}</td><td>${dados.cant}</td><td>$${dados.ingr.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.ingr - dados.costo).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
             tabla_top.appendChild(fila);
         });
 
@@ -1191,7 +1188,7 @@ const APP = {
         Object.entries(empresas).forEach(([emp, dados]) => {
             const pct = ((dados.recibido / dados.enviado) * 100).toFixed(1);
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${emp}</strong></td><td>$${dados.enviado.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${dados.recibido.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.enviado - dados.recibido).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${pct}%</td>`;
+            fila.innerHTML = `<td><strong>${esc(emp)}</strong></td><td>$${dados.enviado.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${dados.recibido.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.enviado - dados.recibido).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${pct}%</td>`;
             tabla_emp.appendChild(fila);
         });
     },
@@ -1605,6 +1602,11 @@ function parsearFechaLocal(fechaStr) {
     return new Date(y, m - 1, d);
 }
 
+function esc(s) {
+    if(s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function formatearFecha(fechaStr) {
     if(!fechaStr) return '-';
     return parsearFechaLocal(fechaStr).toLocaleDateString('es-CO');
@@ -1627,10 +1629,10 @@ function filaVentaHTML(v) {
     const resumen = items.map(it => {
         const prod = APP.datos.productos.find(p => p.ref === it.ref);
         const nombre = it.nombre || (prod ? prod.nombre : '');
-        return `<strong>${it.ref}</strong>${nombre ? ' ' + nombre : ''} x${it.cantidad}`;
+        return `<strong>${esc(it.ref)}</strong>${nombre ? ' ' + esc(nombre) : ''} x${it.cantidad}`;
     }).join(', ');
     const clienteReal = v.cliente_id ? (v.cliente || v.cliente_nombre || '') : '';
-    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${clienteReal}</td><td>${normalizarCiudad(v.ciudad) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarVenta('${v.id}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${v.id}')">🗑️</button></td>`;
+    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(clienteReal)}</td><td>${esc(normalizarCiudad(v.ciudad)) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarVenta('${esc(v.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${esc(v.id)}')">🗑️</button></td>`;
 }
 
 function calcularCostoFIFO(ref, cantidadNueva, fechaVenta) {
@@ -1737,7 +1739,7 @@ function renderCarrito() {
     } else {
         carritoActual.forEach((it, idx) => {
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${it.ref}</strong></td><td>${it.nombre || '-'}</td><td>${it.cantidad}</td><td>$${it.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button type="button" class="btn-small btn-delete" onclick="quitarItemCarrito(${idx})">🗑️</button></td>`;
+            fila.innerHTML = `<td><strong>${esc(it.ref)}</strong></td><td>${esc(it.nombre) || '-'}</td><td>${it.cantidad}</td><td>$${it.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${it.costo_total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button type="button" class="btn-small btn-delete" onclick="quitarItemCarrito(${idx})">🗑️</button></td>`;
             tbody.appendChild(fila);
         });
     }
@@ -2141,14 +2143,6 @@ function esGuiaValida(guia) {
 }
 
 
-function importarDatosExcel() {
-    // Desde que los datos viven en Supabase, la carga masiva del Excel se
-    // hace con migrar_a_supabase.py (más rápido y ya probado con los datos
-    // reales del negocio) en vez de subir el JSON crudo aquí en el
-    // navegador fila por fila. Este botón se deja como referencia de dónde
-    // ejecutar ese paso si algún día hace falta recargar el histórico.
-    alert('Para cargar datos masivos del Excel a Supabase, usa el script "migrar_a_supabase.py" (ver instrucciones en el archivo). Este botón del navegador ya no se usa para esa tarea, para no duplicar cientos de operaciones una por una en el navegador.');
-}
 
 function exportarJSON() {
     const datos = {
