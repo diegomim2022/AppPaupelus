@@ -217,7 +217,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Precio Base Venta (Pesos) *</label>
-                            <input type="number" id="prod-precio" required placeholder="160000" step="1000">
+                            <input type="text" inputmode="numeric" id="prod-precio" required placeholder="160.000" oninput="formatMiles(this)">
                         </div>
                     </div>
                     <button type="submit" class="btn" id="prod-submit-btn">➕ Agregar Producto</button>
@@ -262,7 +262,7 @@
                     </div>
                     <div class="form-group">
                         <label>Costo Unitario (Pesos)</label>
-                        <input type="number" id="comp-costo" placeholder="0" step="100">
+                        <input type="text" inputmode="numeric" id="comp-costo" placeholder="0" oninput="formatMiles(this)">
                     </div>
                     <div class="form-group" style="display:flex;align-items:flex-end;">
                         <button type="button" class="btn" onclick="agregarItemCompra()">+ Agregar Producto</button>
@@ -332,11 +332,11 @@
                         </div>
                         <div class="form-group">
                             <label>Precio Unitario (Pesos)</label>
-                            <input type="number" id="item-precio" placeholder="160000" step="1000">
+                            <input type="text" inputmode="numeric" id="item-precio" placeholder="160.000" oninput="formatMiles(this)">
                         </div>
                         <div class="form-group">
                             <label>Costo Unitario (Pesos)</label>
-                            <input type="number" id="item-costo" placeholder="Se sugiere automático" step="100">
+                            <input type="text" inputmode="numeric" id="item-costo" placeholder="Se sugiere automático" oninput="formatMiles(this)">
                         </div>
                         <div class="form-group" style="display: flex; align-items: flex-end;">
                             <button type="button" class="btn" onclick="agregarItemCarrito()" style="width: 100%;">➕ Agregar Producto</button>
@@ -392,11 +392,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Costo de Envío de la Venta (Pesos)</label>
-                            <input type="number" id="vent-envio" placeholder="0" step="500">
+                            <input type="text" inputmode="numeric" id="vent-envio" placeholder="0" oninput="formatMiles(this)">
                         </div>
                         <div class="form-group">
                             <label>Abono Recibido (Pesos)</label>
-                            <input type="number" id="vent-abono" placeholder="0" step="1000" oninput="actualizarSaldoVenta()">
+                            <input type="text" inputmode="numeric" id="vent-abono" placeholder="0" oninput="formatMiles(this); actualizarSaldoVenta()">
                         </div>
                         <div class="form-group">
                             <label>Saldo por Cobrar</label>
@@ -706,7 +706,7 @@
                 <input type="hidden" id="modal-pago-entrega-id">
                 <div class="form-group" style="margin-bottom:15px;">
                     <label>Monto recibido *</label>
-                    <input type="number" id="modal-pago-monto" required placeholder="0" step="1000" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
+                    <input type="text" inputmode="numeric" id="modal-pago-monto" required placeholder="0" oninput="formatMiles(this)" style="width:100%; padding:10px; border:1px solid #eecfdc; border-radius:6px;">
                     <div style="margin-top:8px;">
                         <button type="button" class="btn-small" onclick="ponerSaldoCompleto()">Pagó todo el saldo</button>
                     </div>
@@ -1257,7 +1257,7 @@ async function agregarProducto(e) {
         color: document.getElementById('prod-color').value.trim(),
         longitud: document.getElementById('prod-long').value.trim(),
         tipo: document.getElementById('prod-tipo').value.trim(),
-        precio: parseFloat(document.getElementById('prod-precio').value) || 0
+        precio: leerMiles('prod-precio')
     };
     const editId = document.getElementById('prod-edit-id').value;
     if(editId) {
@@ -1286,7 +1286,7 @@ function editarProducto(id) {
     document.getElementById('prod-color').value = p.color || '';
     document.getElementById('prod-long').value = p.longitud || '';
     document.getElementById('prod-tipo').value = p.tipo || '';
-    document.getElementById('prod-precio').value = p.precio || '';
+    ponerMiles('prod-precio', p.precio);
     document.getElementById('prod-submit-btn').textContent = '💾 Guardar Cambios';
     document.getElementById('prod-cancel-btn').style.display = 'inline-block';
     document.getElementById('prod-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -1305,7 +1305,7 @@ function agregarItemCompra() {
     const refInput = document.getElementById('comp-ref');
     const ref = refInput.value.trim();
     const cant = parseInt(document.getElementById('comp-cant').value) || 0;
-    const costo = parseFloat(document.getElementById('comp-costo').value) || 0;
+    const costo = leerMiles('comp-costo');
     if(!ref || cant <= 0 || costo <= 0) { alert('Completa referencia, cantidad y costo'); return; }
 
     const prod = APP.datos.productos.find(p => p.ref === ref);
@@ -1670,6 +1670,29 @@ function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+function formatMiles(input) {
+    let pos = input.selectionStart;
+    let antes = input.value;
+    let solo = antes.replace(/[^\d]/g, '');
+    if(!solo) { input.value = ''; return; }
+    let fmt = Number(solo).toLocaleString('es-CO');
+    input.value = fmt;
+    let diff = fmt.length - antes.length;
+    input.selectionStart = input.selectionEnd = Math.max(0, pos + diff);
+}
+
+function leerMiles(id) {
+    let v = document.getElementById(id).value;
+    return parseFloat(v.replace(/\./g, '').replace(/,/g, '.')) || 0;
+}
+
+function ponerMiles(id, num) {
+    let el = document.getElementById(id);
+    if(!el) return;
+    if(!num && num !== 0) { el.value = ''; return; }
+    el.value = Math.round(Number(num)).toLocaleString('es-CO');
+}
+
 function formatearFecha(fechaStr) {
     if(!fechaStr) return '-';
     return parsearFechaLocal(fechaStr).toLocaleDateString('es-CO');
@@ -1757,12 +1780,12 @@ function sugerirCostoItem() {
         const fecha = document.getElementById('vent-fecha').value || hoyISO();
         const cant = parseInt(document.getElementById('item-cant').value) || 1;
         const costoUnitario = calcularCostoFIFO(ref, cant, fecha);
-        if(costoUnitario > 0) costoField.value = Math.round(costoUnitario);
+        if(costoUnitario > 0) { costoField.value = Math.round(costoUnitario).toLocaleString('es-CO'); }
     }
     const precioField = document.getElementById('item-precio');
     if(!precioField.value) {
         const prod = APP.datos.productos.find(p => p.ref === ref);
-        if(prod && prod.precio) precioField.value = prod.precio;
+        if(prod && prod.precio) precioField.value = Math.round(prod.precio).toLocaleString('es-CO');
     }
 }
 
@@ -1770,8 +1793,8 @@ function agregarItemCarrito() {
     const refInput = document.getElementById('item-ref');
     const ref = refInput.value.trim();
     const cant = parseInt(document.getElementById('item-cant').value) || 0;
-    const precio = parseFloat(document.getElementById('item-precio').value) || 0;
-    const costo = parseFloat(document.getElementById('item-costo').value) || 0;
+    const precio = leerMiles('item-precio');
+    const costo = leerMiles('item-costo');
     if(!ref || cant <= 0 || precio <= 0) { alert('Completa referencia, cantidad y precio del producto'); return; }
     const nombreSeleccionado = refInput.dataset.nombreSeleccionado;
     const prod = APP.datos.productos.find(p => p.ref === ref);
@@ -1817,7 +1840,7 @@ function actualizarSaldoVenta() {
     const el = document.getElementById('vent-saldo-display');
     if(!el) return;
     const total = carritoActual.reduce((s, it) => s + it.subtotal, 0);
-    const abono = parseFloat(document.getElementById('vent-abono').value) || 0;
+    const abono = leerMiles('vent-abono');
     const saldo = total - abono;
     el.textContent = '$' + saldo.toLocaleString('es-CO', {maximumFractionDigits: 0});
     el.style.color = saldo > 0 ? '#c0575c' : '#2e7d5c';
@@ -1829,7 +1852,7 @@ function sugerirEnvio() {
     const ciudad = document.getElementById('vent-ciudad').value.trim().toLowerCase();
     if(!ciudad) return;
     const esBogota = ciudad === 'bogota' || ciudad === 'bogotá';
-    envioField.value = esBogota ? 10000 : 25000;
+    envioField.value = esBogota ? '10.000' : '25.000';
 }
 
 async function agregarVenta(e) {
@@ -1839,8 +1862,8 @@ async function agregarVenta(e) {
     const clienteInput = document.getElementById('vent-cliente');
     const cliente = clienteInput.value.trim();
     const ciudad = document.getElementById('vent-ciudad').value.trim();
-    const costoEnvio = parseFloat(document.getElementById('vent-envio').value) || 0;
-    const abono = parseFloat(document.getElementById('vent-abono').value) || 0;
+    const costoEnvio = leerMiles('vent-envio');
+    const abono = leerMiles('vent-abono');
     if(!fecha) { alert('La fecha es obligatoria'); return; }
 
     const items = carritoActual.map(it => ({...it}));
@@ -1952,8 +1975,8 @@ function editarVenta(id) {
     clienteInput.value = v.cliente || '';
     clienteInput.dataset.clienteId = v.cliente_id || '';
     document.getElementById('vent-ciudad').value = v.ciudad || '';
-    document.getElementById('vent-envio').value = v.costo_envio || '';
-    document.getElementById('vent-abono').value = v.abono || '';
+    ponerMiles('vent-envio', v.costo_envio);
+    ponerMiles('vent-abono', v.abono);
     carritoActual = itemsDeVenta(v).map(it => ({...it}));
     renderCarrito();
     document.getElementById('vent-submit-btn').textContent = '💾 Guardar Cambios';
@@ -2001,13 +2024,13 @@ function abrirModalPago(entregaId) {
 function ponerSaldoCompleto() {
     const id = document.getElementById('modal-pago-entrega-id').value;
     const entrega = APP.datos.entregas.find(x => x.id === id);
-    if(entrega) document.getElementById('modal-pago-monto').value = entrega.saldo;
+    if(entrega) ponerMiles('modal-pago-monto', entrega.saldo);
 }
 
 async function guardarPagoModal(e) {
     e.preventDefault();
     const entregaId = document.getElementById('modal-pago-entrega-id').value;
-    const monto = parseFloat(document.getElementById('modal-pago-monto').value) || 0;
+    const monto = leerMiles('modal-pago-monto');
     const quien = document.getElementById('modal-pago-quien').value;
     const fecha = document.getElementById('modal-pago-fecha').value;
     if(monto <= 0) { alert('El monto debe ser mayor a 0'); return; }
