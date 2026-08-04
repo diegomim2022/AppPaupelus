@@ -1360,9 +1360,8 @@ function renderSelectsProducto() {
     campos.forEach(({ selId, campo }) => {
         const sel = document.getElementById(selId);
         if(!sel) return;
-        const deProductos = APP.datos.productos.map(p => (p[campo] || '').trim()).filter(Boolean);
         const base = VALORES_BASE[campo] || [];
-        const valores = [...new Set([...base, ...deProductos])].sort((a, b) => a.localeCompare(b, 'es'));
+        const valores = [...base].sort((a, b) => a.localeCompare(b, 'es'));
         const actual = sel.value;
         sel.innerHTML = '<option value="">-- Selecciona --</option>'
             + valores.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
