@@ -1341,6 +1341,14 @@ function cancelarEdicionProducto() {
     document.querySelectorAll('.campo-nuevo').forEach(el => { el.classList.remove('visible'); el.value = ''; });
 }
 
+const VALORES_BASE = {
+    color: ['Azul','Banda silicona','Blanco','Café','Caramelo','Castaño medio','Chocolate','Cobrizo','Fantasia','Fucsia','Gris','Lila','Mechon','Morada','Naranja','Negro','Pony Tail','Rojo','Rosada','Rubio','Rubio medio','Soporte peluca','Verde'],
+    longitud: ['Corto','Extra largo','Largo','Medio'],
+    tipo: ['Crespo','Liso','Ondulado','Semi-Liso','Semi-Ondulado'],
+    corte: ['Balaca','Con Fleco','LaceFront','Sin Fleco'],
+    detalle: ['Arcoiris','Azul','BabyLight','Balayage','Beige','Blanco','Cafe','Caramelo','Cenizo','Cereza','Chocolate','Claro','Cobrizo','Contornos','Dorado','Fuego','Capas','Mechones','Mechones chunky','Mitad','Morada','Naranja','Negro','Oscuro','Raiz','Rayitos','Roja','Rosada','Rubio medio','Underlights','Uniforme','Vainilla','VinoTinto']
+};
+
 function renderSelectsProducto() {
     const campos = [
         { selId: 'prod-color-sel', campo: 'color' },
@@ -1352,9 +1360,9 @@ function renderSelectsProducto() {
     campos.forEach(({ selId, campo }) => {
         const sel = document.getElementById(selId);
         if(!sel) return;
-        const valores = [...new Set(
-            APP.datos.productos.map(p => (p[campo] || '').trim()).filter(Boolean)
-        )].sort((a, b) => a.localeCompare(b, 'es'));
+        const deProductos = APP.datos.productos.map(p => (p[campo] || '').trim()).filter(Boolean);
+        const base = VALORES_BASE[campo] || [];
+        const valores = [...new Set([...base, ...deProductos])].sort((a, b) => a.localeCompare(b, 'es'));
         const actual = sel.value;
         sel.innerHTML = '<option value="">-- Selecciona --</option>'
             + valores.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
