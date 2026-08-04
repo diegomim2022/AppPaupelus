@@ -10,6 +10,8 @@ create table productos (
   color text default '',
   longitud text default '',
   tipo text default '',
+  corte text default '',
+  detalle text default '',
   precio numeric not null default 0,
   created_at timestamptz default now()
 );

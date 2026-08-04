@@ -221,6 +221,16 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label>Corte</label>
+                            <select id="prod-corte-sel" onchange="toggleNuevo('corte')"><option value="">-- Selecciona --</option></select>
+                            <input type="text" id="prod-corte" class="campo-nuevo" placeholder="Escribe el nuevo corte">
+                        </div>
+                        <div class="form-group">
+                            <label>Detalle</label>
+                            <select id="prod-detalle-sel" onchange="toggleNuevo('detalle')"><option value="">-- Selecciona --</option></select>
+                            <input type="text" id="prod-detalle" class="campo-nuevo" placeholder="Escribe el nuevo detalle">
+                        </div>
+                        <div class="form-group">
                             <label>Precio Base Venta (Pesos) *</label>
                             <input type="text" inputmode="numeric" id="prod-precio" required placeholder="160.000" oninput="formatMiles(this)">
                         </div>
@@ -241,6 +251,8 @@
                             <th>Color</th>
                             <th>Longitud</th>
                             <th>Tipo</th>
+                            <th>Corte</th>
+                            <th>Detalle</th>
                             <th>Precio Venta</th>
                             <th>Acciones</th>
                         </tr>
@@ -1053,10 +1065,10 @@ const APP = {
         tabla.innerHTML = '';
         this.datos.productos.forEach(p => {
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${esc(p.ref)}</strong></td><td>${esc(p.nombre)}</td><td>${esc(p.color) || '-'}</td><td>${esc(p.longitud) || '-'}</td><td>${esc(p.tipo) || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${esc(p.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${esc(p.id)}')">🗑️</button></td>`;
+            fila.innerHTML = `<td><strong>${esc(p.ref)}</strong></td><td>${esc(p.nombre)}</td><td>${esc(p.color) || '-'}</td><td>${esc(p.longitud) || '-'}</td><td>${esc(p.tipo) || '-'}</td><td>${esc(p.corte) || '-'}</td><td>${esc(p.detalle) || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${esc(p.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${esc(p.id)}')">🗑️</button></td>`;
             tabla.appendChild(fila);
         });
-        if(this.datos.productos.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin productos. ¡Agrega uno!</td></tr>';
+        if(this.datos.productos.length === 0) tabla.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">Sin productos. ¡Agrega uno!</td></tr>';
         renderSelectsProducto();
     },
 
@@ -1263,6 +1275,8 @@ async function agregarProducto(e) {
         color: obtenerValorCampo('color'),
         longitud: obtenerValorCampo('long'),
         tipo: obtenerValorCampo('tipo'),
+        corte: obtenerValorCampo('corte'),
+        detalle: obtenerValorCampo('detalle'),
         precio: leerMiles('prod-precio')
     };
     const editId = document.getElementById('prod-edit-id').value;
@@ -1292,6 +1306,8 @@ function editarProducto(id) {
     setSelectProducto('color', p.color || '');
     setSelectProducto('long', p.longitud || '');
     setSelectProducto('tipo', p.tipo || '');
+    setSelectProducto('corte', p.corte || '');
+    setSelectProducto('detalle', p.detalle || '');
     ponerMiles('prod-precio', p.precio);
     document.getElementById('prod-submit-btn').textContent = '💾 Guardar Cambios';
     document.getElementById('prod-cancel-btn').style.display = 'inline-block';
@@ -1329,7 +1345,9 @@ function renderSelectsProducto() {
     const campos = [
         { selId: 'prod-color-sel', campo: 'color' },
         { selId: 'prod-long-sel', campo: 'longitud' },
-        { selId: 'prod-tipo-sel', campo: 'tipo' }
+        { selId: 'prod-tipo-sel', campo: 'tipo' },
+        { selId: 'prod-corte-sel', campo: 'corte' },
+        { selId: 'prod-detalle-sel', campo: 'detalle' }
     ];
     campos.forEach(({ selId, campo }) => {
         const sel = document.getElementById(selId);
