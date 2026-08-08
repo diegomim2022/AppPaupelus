@@ -850,7 +850,13 @@ const APP = {
         const ok = await this.cargarDatos();
         if(!ok) return;
         this.conectarEventos();
-        this.actualizarTodo();
+        this.actualizarProductos();
+        this.actualizarCompras();
+        this.actualizarVentas();
+        this.actualizarEntregas();
+        this.actualizarDashboard();
+        this.actualizarInventario();
+        this.actualizarReportes();
         if(typeof actualizarEstadoDatos === 'function') actualizarEstadoDatos();
     },
 
@@ -915,7 +921,7 @@ const APP = {
                 const id = e.target.getAttribute('data-section');
                 document.getElementById(id).classList.add('active');
                 e.target.classList.add('active');
-                this.actualizarTodo();
+                this.actualizarSeccion(id);
             });
         });
 
@@ -951,14 +957,26 @@ const APP = {
         });
     },
 
+    seccionActiva() {
+        const el = document.querySelector('.section.active');
+        return el ? el.id : 'dashboard';
+    },
+
+    actualizarSeccion(id) {
+        const mapa = {
+            'dashboard': () => this.actualizarDashboard(),
+            'productos': () => this.actualizarProductos(),
+            'compras': () => this.actualizarCompras(),
+            'ventas': () => this.actualizarVentas(),
+            'entregas': () => this.actualizarEntregas(),
+            'inventario': () => this.actualizarInventario(),
+            'reportes': () => this.actualizarReportes()
+        };
+        if(mapa[id]) mapa[id]();
+    },
+
     actualizarTodo() {
-        this.actualizarProductos();
-        this.actualizarCompras();
-        this.actualizarVentas();
-        this.actualizarEntregas();
-        this.actualizarDashboard();
-        this.actualizarInventario();
-        this.actualizarReportes();
+        this.actualizarSeccion(this.seccionActiva());
     },
 
     // Valora el stock que queda con FIFO: arma los lotes de compra de cada
