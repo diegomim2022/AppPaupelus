@@ -48,7 +48,7 @@
         .filtro-col:focus { outline: none; border-color: #f4a9c4; box-shadow: 0 0 0 2px rgba(244,169,196,0.25); }
         .sin-resultados-filtro td { text-align: center; color: #999; padding: 18px; }
         .modal-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 900; align-items: center; justify-content: center; padding: 15px; }
-        .modal-fondo.abierto { display: flex; }
+
         .modal-caja { background: white; border-radius: 12px; padding: 25px; width: 100%; max-width: 460px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
         .modal-caja h3 { color: #d6598c; margin-bottom: 5px; }
         .modal-resumen { background: #fdf0f5; border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 13px; line-height: 1.7; }
@@ -64,7 +64,6 @@
         .search-box { margin-bottom: 15px; display: flex; gap: 10px; }
         .search-box input { flex: 1; padding: 10px; border: 1px solid #eecfdc; border-radius: 6px; }
         .alert { padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert-info { background: #fdf0f5; color: #7a3a56; border: 1px solid #f4a9c4; }
         h2 { color: #444; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f4a9c4; }
         h3 { color: #666; margin: 20px 0 15px 0; }
@@ -2107,8 +2106,8 @@ function abrirModalPago(entregaId) {
     document.getElementById('modal-pago-fecha').value = hoyISO();
     const guiaTxt = esGuiaValida(entrega.guia) ? entrega.guia : 'Sin guía';
     document.getElementById('modal-pago-resumen').innerHTML =
-        `<strong>${entrega.cliente}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
-        `Guía: ${guiaTxt} | Empresa: ${entrega.empresa || 'Por definir'}<br>` +
+        `<strong>${esc(entrega.cliente)}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
+        `Guía: ${esc(guiaTxt)} | Empresa: ${esc(entrega.empresa || 'Por definir')}<br>` +
         `Total: $${entrega.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})} | ` +
         `Abonado: $${entrega.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})} | ` +
         `<strong style="color:#c0575c;">Saldo: $${entrega.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</strong>`;
@@ -2160,7 +2159,7 @@ function abrirModalGuia(entregaId) {
     document.getElementById('modal-guia-numero').value = esGuiaValida(entrega.guia) ? entrega.guia : '';
     document.getElementById('modal-guia-empresa').value = (entrega.empresa && entrega.empresa !== 'Por definir') ? entrega.empresa : '';
     document.getElementById('modal-guia-resumen').innerHTML =
-        `<strong>${entrega.cliente}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
+        `<strong>${esc(entrega.cliente)}</strong> — ${formatearFecha(entrega.fecha)}<br>` +
         `Total: $${entrega.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})} | Estado: ${entrega.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}`;
     document.getElementById('modal-guia').style.display = 'flex';
 }
@@ -2188,14 +2187,14 @@ function actualizarListaProveedores() {
     const dl = document.getElementById('lista-proveedores');
     if(!dl) return;
     const unicos = [...new Set(APP.datos.compras.map(c => c.proveedor).filter(p => p && p.trim()))].sort();
-    dl.innerHTML = unicos.map(p => `<option value="${p}"></option>`).join('');
+    dl.innerHTML = unicos.map(p => `<option value="${esc(p)}"></option>`).join('');
 }
 
 function actualizarListaEmpresas() {
     const dl = document.getElementById('lista-empresas');
     if(!dl) return;
     const unicos = [...new Set(APP.datos.entregas.map(e => e.empresa).filter(emp => emp && emp.trim() && emp !== 'Por definir'))].sort();
-    dl.innerHTML = unicos.map(emp => `<option value="${emp}"></option>`).join('');
+    dl.innerHTML = unicos.map(emp => `<option value="${esc(emp)}"></option>`).join('');
 }
 
 const CIUDADES_CORREGIDAS = {
