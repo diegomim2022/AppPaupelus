@@ -638,18 +638,18 @@
                     </tfoot>
                 </table>
 
-                <h3 style="margin-top: 40px;">Resumen General</h3>
+                <h3 style="margin-top: 40px;">Resumen del Mes Actual</h3>
                 <div class="grid">
                     <div class="card">
                         <h3>Total Invertido</h3>
                         <div class="value" id="rep-compras">$0</div>
                     </div>
                     <div class="card">
-                        <h3>Total Ingresos</h3>
+                        <h3>Ingresos del Mes</h3>
                         <div class="value" id="rep-ventas">$0</div>
                     </div>
                     <div class="card">
-                        <h3>Ganancia Neta</h3>
+                        <h3>Ganancia del Mes</h3>
                         <div class="value" id="rep-ganancia">$0</div>
                     </div>
                     <div class="card">
@@ -1186,14 +1186,18 @@ const APP = {
     },
 
     actualizarReportes() {
+        const hoy = new Date();
+        const mesActual = String(hoy.getFullYear()) + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
         const compras = this.datos.compras.reduce((s, c) => s + c.costo_total, 0);
-        const ventas = this.datos.ventas.reduce((s, v) => s + v.total, 0);
-        const ganancia = ventas - compras;
-        const margen = ventas > 0 ? ((ganancia / ventas) * 100).toFixed(1) : 0;
+        const ventasMes = this.datos.ventas.filter(v => v.fecha && v.fecha.startsWith(mesActual));
+        const ingresosMes = ventasMes.reduce((s, v) => s + v.total, 0);
+        const costoMes = ventasMes.reduce((s, v) => s + (v.costo_total || 0), 0);
+        const gananciaMes = ingresosMes - costoMes;
+        const margen = ingresosMes > 0 ? ((gananciaMes / ingresosMes) * 100).toFixed(1) : 0;
 
         document.getElementById('rep-compras').textContent = '$' + compras.toLocaleString('es-CO', {maximumFractionDigits: 0});
-        document.getElementById('rep-ventas').textContent = '$' + ventas.toLocaleString('es-CO', {maximumFractionDigits: 0});
-        document.getElementById('rep-ganancia').textContent = '$' + ganancia.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('rep-ventas').textContent = '$' + ingresosMes.toLocaleString('es-CO', {maximumFractionDigits: 0});
+        document.getElementById('rep-ganancia').textContent = '$' + gananciaMes.toLocaleString('es-CO', {maximumFractionDigits: 0});
         document.getElementById('rep-margen').textContent = margen + '%';
 
         // El costo por producto se toma del costo FIFO ya calculado en cada
