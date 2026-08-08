@@ -638,7 +638,7 @@
                     </tfoot>
                 </table>
 
-                <h3 style="margin-top: 40px;">Resumen del Mes Actual</h3>
+                <h3 style="margin-top: 40px;" id="rep-titulo-resumen">Resumen del Mes Actual</h3>
                 <div class="grid">
                     <div class="card">
                         <h3>Total Invertido</h3>
@@ -2436,6 +2436,11 @@ function generarReporteFechas() {
     document.getElementById('rep-fechas-utilidad').textContent = '$' + totUtilidad.toLocaleString('es-CO', {maximumFractionDigits: 0});
 
     window._ultimoReporteFechas = filas;
+
+    document.getElementById('rep-ventas').textContent = '$' + totVenta.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('rep-ganancia').textContent = '$' + totUtilidad.toLocaleString('es-CO', {maximumFractionDigits: 0});
+    document.getElementById('rep-margen').textContent = (totVenta > 0 ? ((totUtilidad / totVenta) * 100).toFixed(1) : 0) + '%';
+    document.getElementById('rep-titulo-resumen').textContent = 'Resumen del ' + formatearFecha(desdeStr) + ' al ' + formatearFecha(hastaStr);
 }
 
 function exportarReporteCSV() {
