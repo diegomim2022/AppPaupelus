@@ -1,37 +1,55 @@
 import { APP } from './app.js';
-import { cerrarModal, esc, formatMiles } from './utils.js';
+import { cerrarModal, esc, formatMiles, leerMiles, ponerMiles } from './utils.js';
 import { supabaseClient } from './db.js';
 
 export async function agregarProducto(e) {
-    e.preventDefault();
-    const ref = document.getElementById('prod-ref').value.trim();
-    const nombre = document.getElementById('prod-nombre').value.trim();
-    if(!ref || !nombre) { alert('Referencia y nombre obligatorios'); return; }
-    const datosProd = {
-        ref, nombre,
-        color: obtenerValorCampo('color'),
-        longitud: obtenerValorCampo('long'),
-        tipo: obtenerValorCampo('tipo'),
-        corte: obtenerValorCampo('corte'),
-        detalle: obtenerValorCampo('detalle'),
-        precio: leerMiles('prod-precio')
-    };
-    const editId = document.getElementById('prod-edit-id').value;
-    if(editId) {
-        const { error } = await supabaseClient.from('productos').update(datosProd).eq('id', editId);
-        if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
-        const p = APP.datos.productos.find(x => x.id === editId);
-        if(p) Object.assign(p, datosProd);
-        cancelarEdicionProducto();
-        alert('✅ Producto actualizado');
-    } else {
-        const { data, error } = await supabaseClient.from('productos').insert(datosProd).select();
-        if(error) { alert('❌ Error al agregar: ' + error.message); return; }
-        APP.datos.productos.push(data[0]);
-        e.target.reset();
-        alert('✅ Producto agregado');
+    try {
+        e.preventDefault();
+        const ref = document.getElementById('prod-ref').value.trim();
+        const nombre = document.getElementById('prod-nombre').value.trim();
+        if(!ref || !nombre) { alert('Referencia y nombre obligatorios'); return; }
+        const datosProd = {
+            ref, nombre,
+            color: obtenerValorCampo('color'),
+            longitud: obtenerValorCampo('long'),
+            tipo: obtenerValorCampo('tipo'),
+            corte: obtenerValorCampo('corte'),
+            detalle: obtenerValorCampo('detalle'),
+            precio: leerMiles('prod-precio')
+        };
+        const editId = document.getElementById('prod-edit-id').value;
+        if(editId) {
+            const { error } = await supabaseClient.from('productos').update(datosProd).eq('id', editId);
+            if(error) { 
+                console.error("Supabase Error (Update):", error);
+                alert('❌ Error al actualizar: ' + error.message); 
+                return; 
+            }
+            const p = APP.datos.productos.find(x => x.id === editId);
+            if(p) Object.assign(p, datosProd);
+            cancelarEdicionProducto();
+            alert('✅ Producto actualizado');
+        } else {
+            const { data, error } = await supabaseClient.from('productos').insert(datosProd).select();
+            if(error) { 
+                console.error("Supabase Error (Insert):", error);
+                alert('❌ Error al agregar: ' + error.message); 
+                return; 
+            }
+            if (!data || data.length === 0) {
+                console.error("Supabase devolvió data vacía. Revisa RLS de SELECT para productos.");
+                alert('❌ Error interno: El producto se guardó pero no se pudo recuperar.');
+                return;
+            }
+            APP.datos.productos.push(data[0]);
+            e.target.reset();
+            alert('✅ Producto agregado');
+        }
+        APP.actualizarProductos();
+    } catch (err) {
+        console.error("Error silencioso capturado en agregarProducto:", err);
+        alert("Ocurrió un error inesperado al procesar el producto. Revisa la consola.");
     }
-    APP.actualizarProductos();
 }
 
 export function editarProducto(id) {
