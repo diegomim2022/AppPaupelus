@@ -1,5 +1,6 @@
 import { supabaseClient, cargarDatos, exportarJSON, limpiarTodo, actualizarEstadoDatos } from './db.js';
 import { esc, formatMiles, leerMiles, ponerMiles, formatearFecha, aISOLocal, hoyISO, parsearFechaLocal, rangoRapido, cerrarModal, inicializarAutocomplete, inicializarAutocompleteCliente, inicializarAutocompleteCiudad, aplicarFiltrosTabla, construirFilaFiltros, inicializarFiltrosTablas } from './utils.js';
+import * as Productos from './productos.js';
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -497,3 +498,10 @@ window.aplicarFiltrosTabla = aplicarFiltrosTabla;
 window.construirFilaFiltros = construirFilaFiltros;
 window.inicializarFiltrosTablas = inicializarFiltrosTablas;
 window.supabaseClient = supabaseClient;
+window.agregarProducto = Productos.agregarProducto;
+window.editarProducto = Productos.editarProducto;
+window.setSelectProducto = Productos.setSelectProducto;
+window.cancelarEdicionProducto = Productos.cancelarEdicionProducto;
+window.renderSelectsProducto = Productos.renderSelectsProducto;
+window.toggleNuevo = Productos.toggleNuevo;
+window.obtenerValorCampo = Productos.obtenerValorCampo;
