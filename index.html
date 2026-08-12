@@ -441,6 +441,7 @@
                     <thead>
                         <tr>
                             <th>Guía</th>
+                            <th>N° Venta</th>
                             <th>Cliente</th>
                             <th>Fecha</th>
                             <th>Monto</th>
@@ -1153,8 +1154,12 @@ async function agregarVenta(e) {
         alert(`✅ Venta registrada con ${items.length} producto(s)`);
     }
     
+    console.log("1. Antes de await APP.cargarDatos()");
     await APP.cargarDatos();
+    console.log("2. Después de await APP.cargarDatos(), datos recargados.");
     APP.actualizarTodo();
+    APP.actualizarEntregas(); // Forzar repintado explicito de Entregas como pidió el usuario
+    console.log("3. Fin de agregarVenta() - vistas actualizadas.");
 }
 
 function editarVenta(id) {

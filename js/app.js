@@ -310,6 +310,7 @@ export const APP = {
     },
 
     actualizarEntregas() {
+        console.log("-> Ejecutando actualizarEntregas(). Entregas en memoria:", this.datos.entregas.length);
         const tabla = document.getElementById('tabla-entregas');
         tabla.innerHTML = '';
         const ordenadas = [...this.datos.entregas].sort((a, b) => b.fecha.localeCompare(a.fecha));
@@ -318,10 +319,14 @@ export const APP = {
             const guiaAsignada = esGuiaValida(e.guia) ? e.guia : 'Sin asignar';
             const estadoClass = e.saldo === 0 ? 'color:#2e7d5c;font-weight:bold;' : 'color:#c0575c;';
             const fila = document.createElement('tr');
-            fila.innerHTML = `<td><strong>${esc(guiaAsignada)}</strong></td><td>${esc(e.cliente)}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(e.empresa) || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${esc(e.id)}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${esc(e.id)}')" title="Asignar guía">🏷️</button></td>`;
+            
+            const venta = this.datos.ventas.find(v => v.id === e.venta_id);
+            const numVenta = venta ? venta.numero : '-';
+            
+            fila.innerHTML = `<td><strong>${esc(guiaAsignada)}</strong></td><td>#${numVenta}</td><td>${esc(e.cliente)}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(e.empresa) || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${esc(e.id)}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${esc(e.id)}')" title="Asignar guía">🏷️</button></td>`;
             tabla.appendChild(fila);
         });
-        if(this.datos.entregas.length === 0) tabla.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">Sin entregas registradas</td></tr>';
+        if(this.datos.entregas.length === 0) tabla.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #999;">Sin entregas registradas</td></tr>';
 
         const recibido = this.datos.entregas.reduce((sum, e) => sum + e.abono, 0);
         const total = this.datos.entregas.reduce((sum, e) => sum + e.monto, 0);
