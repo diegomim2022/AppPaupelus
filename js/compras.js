@@ -25,7 +25,7 @@ export function agregarItemCompra() {
         document.getElementById('comp-costo').value = '';
         refInput.focus();
         renderCarritoCompra();
-    }    } catch (err) {
+    } catch (err) {
         console.error("Error capturado en agregarItemCompra:", err);
         alert("Ocurrió un error inesperado. Revisa la consola.");
     }
@@ -35,7 +35,7 @@ export function quitarItemCompra(idx) {
     try {
         carritoCompra.splice(idx, 1);
         renderCarritoCompra();
-    }    } catch (err) {
+    } catch (err) {
         console.error("Error capturado en quitarItemCompra:", err);
         alert("Ocurrió un error inesperado. Revisa la consola.");
     }
@@ -54,7 +54,7 @@ export function renderCarritoCompra() {
         const total = carritoCompra.reduce((s, it) => s + it.costo_total, 0);
         document.getElementById('carrito-compra-total').textContent = '$' + total.toLocaleString('es-CO', {maximumFractionDigits: 0});
         document.getElementById('carrito-compra-costo').textContent = '$' + total.toLocaleString('es-CO', {maximumFractionDigits: 0});
-    }    } catch (err) {
+    } catch (err) {
         console.error("Error capturado en renderCarritoCompra:", err);
         alert("Ocurrió un error inesperado. Revisa la consola.");
     }
@@ -94,7 +94,7 @@ export async function agregarCompra(e) {
             alert('✅ Compra registrada (' + data.length + ' productos)');
         }
         APP.actualizarTodo();
-    }    } catch (err) {
+    } catch (err) {
         console.error("Error capturado en agregarCompra:", err);
         alert("Ocurrió un error inesperado. Revisa la consola.");
     }
@@ -112,7 +112,7 @@ export function editarCompra(id) {
         document.getElementById('comp-submit-btn').textContent = '💾 Guardar Cambios';
         document.getElementById('comp-cancel-btn').style.display = 'inline-block';
         document.getElementById('comp-ref').scrollIntoView({behavior: 'smooth', block: 'center'});
-    }    } catch (err) {
+    } catch (err) {
         console.error("Error capturado en editarCompra:", err);
         alert("Ocurrió un error inesperado. Revisa la consola.");
     }
