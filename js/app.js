@@ -264,7 +264,8 @@ export const APP = {
     actualizarProductos() {
         const tabla = document.getElementById('tabla-productos');
         tabla.innerHTML = '';
-        this.datos.productos.forEach(p => {
+        const ordenados = [...this.datos.productos].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+        ordenados.forEach(p => {
             const fila = document.createElement('tr');
             fila.innerHTML = `<td><strong>${esc(p.ref)}</strong></td><td>${esc(p.nombre)}</td><td>${esc(p.color) || '-'}</td><td>${esc(p.longitud) || '-'}</td><td>${esc(p.tipo) || '-'}</td><td>${esc(p.corte) || '-'}</td><td>${esc(p.detalle) || '-'}</td><td>$${p.precio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarProducto('${esc(p.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarProducto('${esc(p.id)}')">🗑️</button></td>`;
             tabla.appendChild(fila);
@@ -378,8 +379,8 @@ export const APP = {
         const ultimas = document.getElementById('dash-ultimas');
         ultimas.innerHTML = '';
         const ops = [
-            ...this.datos.compras.slice(-5).map(c => ({tipo: 'Compra', fecha: c.fecha, desc: c.ref, monto: c.costo_total})),
-            ...this.datos.ventas.slice(-5).map(v => ({tipo: 'Venta', fecha: v.fecha, desc: itemsDeVenta(v).map(it => it.ref).join(', '), monto: v.total}))
+            ...this.datos.compras.slice(0, 5).map(c => ({tipo: 'Compra', fecha: c.fecha, desc: c.ref, monto: c.costo_total})),
+            ...this.datos.ventas.slice(0, 5).map(v => ({tipo: 'Venta', fecha: v.fecha, desc: itemsDeVenta(v).map(it => it.ref).join(', '), monto: v.total}))
         ].sort((a, b) => parsearFechaLocal(b.fecha) - parsearFechaLocal(a.fecha)).slice(0, 10);
 
         ops.forEach(op => {
@@ -439,7 +440,7 @@ export const APP = {
 
         const tabla_emp = document.getElementById('tabla-empresas');
         tabla_emp.innerHTML = '';
-        Object.entries(empresas).forEach(([emp, dados]) => {
+        Object.entries(empresas).sort((a, b) => b[1].enviado - a[1].enviado).forEach(([emp, dados]) => {
             const pct = ((dados.recibido / dados.enviado) * 100).toFixed(1);
             const fila = document.createElement('tr');
             fila.innerHTML = `<td><strong>${esc(emp)}</strong></td><td>$${dados.enviado.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${dados.recibido.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${(dados.enviado - dados.recibido).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${pct}%</td>`;

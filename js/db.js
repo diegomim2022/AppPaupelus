@@ -59,13 +59,13 @@ export function actualizarEstadoDatos() {
     export async function cargarDatos() {
         try {
             const [rProd, rCli, rComp, rVent, rItems, rEnt, rPag] = await Promise.all([
-                supabaseClient.from('productos').select('*').order('ref'),
-                supabaseClient.from('clientes').select('*').order('nombre'),
-                supabaseClient.from('compras').select('*').order('fecha'),
-                supabaseClient.from('ventas').select('*').order('numero'),
+                supabaseClient.from('productos').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('clientes').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('compras').select('*').order('fecha', { ascending: false }),
+                supabaseClient.from('ventas').select('*').order('fecha', { ascending: false }),
                 supabaseClient.from('venta_items').select('*'),
-                supabaseClient.from('entregas').select('*'),
-                supabaseClient.from('pagos').select('*'),
+                supabaseClient.from('entregas').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('pagos').select('*').order('created_at', { ascending: false }),
             ]);
             const error = rProd.error || rCli.error || rComp.error || rVent.error || rItems.error || rEnt.error || rPag.error;
             if(error) throw error;
