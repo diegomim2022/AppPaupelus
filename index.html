@@ -344,11 +344,11 @@
                         </div>
                         <div class="form-group">
                             <label>Cantidad</label>
-                            <input type="number" id="item-cant" placeholder="1" step="1">
+                            <input type="number" id="item-cant" placeholder="1" step="1" oninput="actualizarSaldoVenta()">
                         </div>
                         <div class="form-group">
                             <label>Precio Unitario (Pesos)</label>
-                            <input type="text" inputmode="numeric" id="item-precio" placeholder="160.000" oninput="formatMiles(this)">
+                            <input type="text" inputmode="numeric" id="item-precio" placeholder="160.000" oninput="formatMiles(this); actualizarSaldoVenta()">
                         </div>
                         <div class="form-group">
                             <label>Costo Unitario (Pesos)</label>
@@ -1899,12 +1899,13 @@ function sugerirCostoItem() {
         const prod = APP.datos.productos.find(p => p.ref === ref);
         if(prod && prod.precio) precioField.value = Math.round(prod.precio).toLocaleString('es-CO');
     }
+    actualizarSaldoVenta();
 }
 
 function agregarItemCarrito() {
     const refInput = document.getElementById('item-ref');
     const ref = refInput.value.trim();
-    const cant = parseInt(document.getElementById('item-cant').value) || 0;
+    const cant = parseInt(document.getElementById('item-cant').value) || 1;
     const precio = leerMiles('item-precio');
     const costo = leerMiles('item-costo');
     if(!ref || cant <= 0 || precio <= 0) { alert('Completa referencia, cantidad y precio del producto'); return; }
@@ -1948,10 +1949,19 @@ function renderCarrito() {
     actualizarSaldoVenta();
 }
 
+function totalConPendiente() {
+    let total = carritoActual.reduce((s, it) => s + it.subtotal, 0);
+    const ref = document.getElementById('item-ref').value.trim();
+    const cant = parseInt(document.getElementById('item-cant').value) || 1;
+    const precio = leerMiles('item-precio');
+    if(ref && precio > 0) total += cant * precio;
+    return total;
+}
+
 function actualizarSaldoVenta() {
     const el = document.getElementById('vent-saldo-display');
     if(!el) return;
-    const total = carritoActual.reduce((s, it) => s + it.subtotal, 0);
+    const total = totalConPendiente();
     const abono = leerMiles('vent-abono');
     const saldo = total - abono;
     el.textContent = '$' + saldo.toLocaleString('es-CO', {maximumFractionDigits: 0});
@@ -1969,6 +1979,11 @@ function sugerirEnvio() {
 
 async function agregarVenta(e) {
     e.preventDefault();
+    const refPendiente = document.getElementById('item-ref').value.trim();
+    const cantPendiente = parseInt(document.getElementById('item-cant').value) || 1;
+    const precioPendiente = leerMiles('item-precio');
+    if(refPendiente && cantPendiente > 0 && precioPendiente > 0) agregarItemCarrito();
+
     if(carritoActual.length === 0) { alert('Agrega al menos un producto a la venta'); return; }
     const fecha = document.getElementById('vent-fecha').value;
     const clienteInput = document.getElementById('vent-cliente');
