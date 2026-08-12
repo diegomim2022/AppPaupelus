@@ -2,7 +2,7 @@ import { APP } from './app.js';
 import { cerrarModal, esc, formatMiles } from './utils.js';
 import { supabaseClient } from './db.js';
 
-export async export function agregarProducto(e) {
+export async function agregarProducto(e) {
     e.preventDefault();
     const ref = document.getElementById('prod-ref').value.trim();
     const nombre = document.getElementById('prod-nombre').value.trim();

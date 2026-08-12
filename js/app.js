@@ -269,7 +269,7 @@ export const APP = {
             tabla.appendChild(fila);
         });
         if(this.datos.productos.length === 0) tabla.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">Sin productos. ¡Agrega uno!</td></tr>';
-        renderSelectsProducto();
+        Productos.renderSelectsProducto();
     },
 
     actualizarCompras() {
