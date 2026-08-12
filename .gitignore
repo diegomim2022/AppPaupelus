@@ -1,5 +1,6 @@
 # Datos sensibles y archivos grandes
 migrar_a_supabase.py
+reimportar_2026.py
 paupelus_datos.json
 paupelus_datos_completo.json
 paupelus_respaldo_*.json

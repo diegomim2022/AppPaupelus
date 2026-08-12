@@ -1106,14 +1106,11 @@ async function agregarVenta(e) {
             .insert(itemsPayload.map(it => ({...it, venta_id: editId}))).select();
         if(errIns) { alert('❌ Error al guardar los productos de la venta: ' + errIns.message); return; }
 
-        Object.assign(v, cambiosVenta, { cliente: clienteNombre, items: nuevosItems });
-
         const entrega = APP.datos.entregas.find(x => x.venta_id === v.id);
         if(entrega) {
             const cambiosEntrega = { cliente_nombre: clienteNombre, fecha, monto: total, abono, saldo: Math.max(0, total - abono) };
             const { error: errEnt } = await supabaseClient.from('entregas').update(cambiosEntrega).eq('id', entrega.id);
             if(errEnt) { alert('❌ Error al actualizar el envío: ' + errEnt.message); return; }
-            Object.assign(entrega, cambiosEntrega, { cliente: clienteNombre });
         }
         cancelarEdicionVenta();
         alert('✅ Venta actualizada');
@@ -1142,8 +1139,7 @@ async function agregarVenta(e) {
         }).select();
         if(errPago) console.error(errPago);
 
-        APP.datos.ventas.push({ ...vent, cliente: clienteNombre, items: itemsCreados });
-        APP.datos.entregas.push({ ...entregaCreada[0], cliente: clienteNombre, pagos: pagoCreado || [] });
+        await APP.cargarDatos();
 
         carritoActual = [];
         renderCarrito();
@@ -1156,6 +1152,8 @@ async function agregarVenta(e) {
         actualizarSaldoVenta();
         alert(`✅ Venta registrada con ${items.length} producto(s)`);
     }
+    
+    await APP.cargarDatos();
     APP.actualizarTodo();
 }
 

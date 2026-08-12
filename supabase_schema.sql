@@ -91,9 +91,44 @@ create table pagos (
   created_at timestamptz default now()
 );
 
--- RLS: un solo usuario (la dueña) — basta con exigir sesión autenticada en cada tabla.
--- La seguridad real la da esto (RLS), no que la "anon key" del frontend sea secreta
--- (esa key es pública por diseño en cualquier app Supabase).
+-- ================================================================
+-- RLS: SOLO UNA PERSONA (LA DUEÑA) PUEDE LEER Y ESCRIBIR LOS DATOS.
+-- La anon/publishable key que está en el navegador es pública por
+-- diseño; la seguridad real la dan estas políticas. Antes cualquier
+-- usuario autenticado tenía acceso total (using(true)); ahora solo
+-- las que estén en la tabla app_users.
+--
+-- CONFIGURACIÓN ÚNICA (obligatoria antes de usar la app):
+--   1. Supabase → SQL Editor → ejecuta:  select id, email from auth.users;
+--   2. Copia el "id" de TU cuenta (la que usas para entrar a la app).
+--   3. Reemplaza 'TU_ID_AQUI' en el INSERT de abajo y ejecútalo.
+--   4. Desactiva los registros públicos: Authentication → Settings
+--      → "Allow new users to sign up" = OFF.
+-- ================================================================
+
+create table if not exists public.app_users (
+  id uuid primary key references auth.users(id) on delete cascade
+);
+
+-- 👇 PEGA AQUÍ TU UUID de auth.users:
+insert into public.app_users (id) values ('TU_ID_AQUI')
+on conflict (id) do nothing;
+
+create or replace function public.usuario_autorizado()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.app_users a where a.id = auth.uid());
+$$;
+
+-- app_users solo se puede leer a si mismo (ni siquiera se ve la lista).
+alter table public.app_users enable row level security;
+create policy "ver_propio" on public.app_users
+  for select using (auth.uid() = id);
+
 alter table productos enable row level security;
 alter table clientes enable row level security;
 alter table compras enable row level security;
@@ -102,10 +137,21 @@ alter table venta_items enable row level security;
 alter table entregas enable row level security;
 alter table pagos enable row level security;
 
-create policy "auth_full_access" on productos for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on clientes  for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on compras   for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on ventas    for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on venta_items for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on entregas  for all to authenticated using (true) with check (true);
-create policy "auth_full_access" on pagos     for all to authenticated using (true) with check (true);
+-- Reemplazamos las políticas viejas por unas que solo permiten a la
+-- dueña. El frontend usa siempre la anon key + login: si el usuario de
+-- la sesión no está en app_users, no ve ni toca nada.
+drop policy if exists "auth_full_access" on public.productos;
+drop policy if exists "auth_full_access" on public.clientes;
+drop policy if exists "auth_full_access" on public.compras;
+drop policy if exists "auth_full_access" on public.ventas;
+drop policy if exists "auth_full_access" on public.venta_items;
+drop policy if exists "auth_full_access" on public.entregas;
+drop policy if exists "auth_full_access" on public.pagos;
+
+create policy "solo_duena" on public.productos   for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.clientes    for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.compras     for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.ventas      for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.venta_items for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.entregas    for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.pagos       for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
