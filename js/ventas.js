@@ -373,7 +373,7 @@ export async function agregarVenta(e) {
         
         await APP.cargarDatos();
         APP.actualizarTodo();
-        APP.actualizarEntregas();
+
     } catch (err) {
         console.error("Error capturado en agregarVenta:", err);
         alert("Ocurrió un error inesperado al guardar la venta. Revisa la consola.");
