@@ -196,7 +196,7 @@ export const APP = {
             tabla.appendChild(fila);
         });
         if(this.datos.compras.length === 0) tabla.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">Sin compras registradas</td></tr>';
-        actualizarListaProveedores();
+        Compras.actualizarListaProveedores();
     },
 
     actualizarVentas() {
@@ -254,6 +254,7 @@ window.abrirModalGuia = abrirModalGuia;
 window.guardarGuiaModal = guardarGuiaModal;
 window.actualizarEstadoDatos = Datos.actualizarEstadoDatos;
 window.cargarDatos = Datos.cargarDatos;
+window.actualizarListaProveedores = Compras.actualizarListaProveedores;
 window.esc = esc;
 window.leerMiles = leerMiles;
 window.ponerMiles = ponerMiles;

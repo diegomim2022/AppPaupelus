@@ -3,6 +3,19 @@ export function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+const TABLAS_CON_FILTRO = [
+    { tbody: 'tabla-productos', omitir: ['Acciones'] },
+    { tbody: 'tabla-compras', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas-envios', omitir: ['Acciones'] },
+    { tbody: 'tabla-ventas-cobro', omitir: ['Acciones'] },
+    { tbody: 'tabla-entregas', omitir: ['Acciones'] },
+    { tbody: 'tabla-inventario', omitir: [] },
+    { tbody: 'tabla-reporte-fechas', omitir: [] },
+    { tbody: 'tabla-top', omitir: [] },
+    { tbody: 'tabla-empresas', omitir: [] },
+];
+
 
 export function formatMiles(input) {
     let pos = input.selectionStart;

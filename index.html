@@ -704,59 +704,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module" src="./js/app.js?v=1"></script>
-<script>
-
-
-
-
-    </script>
-
-    <script>
-
-
-
-
-
-
-
-let chartMesesActual = 1;
-
-function actualizarListaProveedores() {
-    const dl = document.getElementById('lista-proveedores');
-    if(!dl) return;
-    const unicos = [...new Set(APP.datos.compras.map(c => c.proveedor).filter(p => p && p.trim()))].sort();
-    dl.innerHTML = unicos.map(p => `<option value="${esc(p)}"></option>`).join('');
-}
-
-
-
-
-
-
-
-
-
-
-// ===== FILTROS POR COLUMNA =====
-// Inserta una fila de cajas de búsqueda bajo los encabezados de cada tabla
-// y filtra las filas mostrando solo las que coinciden en TODAS las columnas
-// con texto escrito. Funciona sobre el texto ya renderizado, así que sirve
-// igual para fechas formateadas, montos con $ y puntos, nombres, etc.
-const TABLAS_CON_FILTRO = [
-    { tbody: 'tabla-productos', omitir: ['Acciones'] },
-    { tbody: 'tabla-compras', omitir: ['Acciones'] },
-    { tbody: 'tabla-ventas', omitir: ['Acciones'] },
-    { tbody: 'tabla-ventas-envios', omitir: ['Acciones'] },
-    { tbody: 'tabla-ventas-cobro', omitir: ['Acciones'] },
-    { tbody: 'tabla-entregas', omitir: ['Acciones'] },
-    { tbody: 'tabla-inventario', omitir: [] },
-    { tbody: 'tabla-reporte-fechas', omitir: [] },
-    { tbody: 'tabla-top', omitir: [] },
-    { tbody: 'tabla-empresas', omitir: [] },
-];
-
-
-
-    </script>
 </body>
 </html>

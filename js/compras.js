@@ -5,6 +5,18 @@ import { leerMiles, esc, hoyISO } from './utils.js';
 let carritoCompra = [];
 
 
+export function actualizarListaProveedores() {
+    try {
+        const dl = document.getElementById('lista-proveedores');
+        if(!dl) return;
+        const unicos = [...new Set(APP.datos.compras.map(c => c.proveedor).filter(p => p && p.trim()))].sort();
+        dl.innerHTML = unicos.map(p => `<option value="${esc(p)}"></option>`).join('');
+    } catch (err) {
+        console.error("Error al actualizar la lista de proveedores", err);
+    }
+}
+
+
 export function agregarItemCompra() {
     try {
         const refInput = document.getElementById('comp-ref');
