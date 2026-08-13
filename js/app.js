@@ -86,13 +86,7 @@ export const APP = {
         const ok = await this.cargarDatos();
         if(!ok) return;
         this.conectarEventos();
-        this.actualizarProductos();
-        this.actualizarCompras();
-        this.actualizarVentas();
-        this.actualizarEntregas();
         this.actualizarDashboard();
-        this.actualizarInventario();
-        this.actualizarReportes();
         if(typeof actualizarEstadoDatos === 'function') actualizarEstadoDatos();
     },
 
