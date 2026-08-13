@@ -236,8 +236,7 @@ export function inicializarAutocompleteCiudad(inputId, listaId) {
 }
 
 
-export function aplicarFiltrosTabla(tbody) {
-function aplicarFiltrosTabla(tbody, input) {
+export function aplicarFiltrosTabla(tbody, input) {
     try {
         if (!input) return;
         const query = input.value.trim();
