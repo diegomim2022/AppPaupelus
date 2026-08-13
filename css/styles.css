@@ -35,10 +35,7 @@ table thead { background: #fdf0f5; }
 table th { padding: 12px; text-align: left; font-weight: 600; color: #7a3a56; border-bottom: 2px solid #f4a9c4; }
 table td { padding: 12px; border-bottom: 1px solid #f5eaef; }
 table tr:hover { background: #fef8fb; }
-tr.fila-filtros th { padding: 6px 8px; border-bottom: 1px solid #f4a9c4; }
-tr.fila-filtros:hover { background: #fdf0f5; }
-.filtro-col { width: 100%; padding: 5px 7px; border: 1px solid #eecfdc; border-radius: 4px; font-family: inherit; font-size: 12px; background: white; }
-.filtro-col:focus { outline: none; border-color: #f4a9c4; box-shadow: 0 0 0 2px rgba(244,169,196,0.25); }
+
 .sin-resultados-filtro td { text-align: center; color: #999; padding: 18px; }
 .modal-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 900; align-items: center; justify-content: center; padding: 15px; }
 

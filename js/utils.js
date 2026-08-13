@@ -237,70 +237,122 @@ export function inicializarAutocompleteCiudad(inputId, listaId) {
 
 
 export function aplicarFiltrosTabla(tbody) {
-    const tabla = tbody.closest('table');
-    const filaFiltros = tabla.querySelector('tr.fila-filtros');
-    if(!filaFiltros) return;
-    const filtros = Array.from(filaFiltros.querySelectorAll('input')).map(i => i.value.trim().toLowerCase());
+function aplicarFiltrosTabla(tbody, input) {
+    try {
+        if (!input) return;
+        const query = input.value.trim();
+        const normalizeStr = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        const queryNorm = normalizeStr(query);
 
-    let visibles = 0;
-    Array.from(tbody.rows).forEach(fila => {
-        if(fila.classList.contains('sin-resultados-filtro')) return;
-        // Filas de mensaje ("Sin productos...") tienen un colspan: no se filtran.
-        if(fila.cells.length < filtros.length) { fila.style.display = ''; visibles++; return; }
-        const coincide = filtros.every((f, idx) => {
-            if(!f) return true;
-            const celda = fila.cells[idx];
-            return celda && celda.textContent.toLowerCase().includes(f);
+        let visibles = 0;
+        Array.from(tbody.rows).forEach(fila => {
+            if (fila.classList.contains('sin-resultados-filtro')) return;
+
+            // Mostrar todo si no hay filtro
+            if (!queryNorm) {
+                fila.style.display = '';
+                visibles++;
+                return;
+            }
+
+            // Ignorar la fila de "Sin productos..." o similares con colspan grande
+            // (A menos que queramos buscar en ella, pero normalmente no)
+            const numCols = fila.cells.length;
+            if (numCols === 1 && fila.cells[0].colSpan > 1) {
+                fila.style.display = '';
+                visibles++;
+                return;
+            }
+
+            // Buscar en todo el texto de la fila junta (incluye todas las celdas visibles)
+            const textoFila = normalizeStr(fila.textContent);
+            const coincide = textoFila.includes(queryNorm);
+
+            fila.style.display = coincide ? '' : 'none';
+            if (coincide) visibles++;
         });
-        fila.style.display = coincide ? '' : 'none';
-        if(coincide) visibles++;
-    });
 
-    let avisoVacio = tbody.querySelector('tr.sin-resultados-filtro');
-    const hayFiltroActivo = filtros.some(f => f);
-    if(visibles === 0 && hayFiltroActivo) {
-        if(!avisoVacio) {
-            avisoVacio = document.createElement('tr');
-            avisoVacio.className = 'sin-resultados-filtro';
-            avisoVacio.innerHTML = `<td colspan="${filtros.length + 1}">Ningún registro coincide con el filtro</td>`;
-            tbody.appendChild(avisoVacio);
+        let avisoVacio = tbody.querySelector('tr.sin-resultados-filtro');
+        if (visibles === 0 && queryNorm) {
+            if (!avisoVacio) {
+                avisoVacio = document.createElement('tr');
+                avisoVacio.className = 'sin-resultados-filtro';
+                const numCols = tbody.rows.length > 0 ? tbody.rows[0].cells.length : 1;
+                avisoVacio.innerHTML = `<td colspan="${numCols}" style="text-align: center; color: #999;">Ningún registro coincide con la búsqueda</td>`;
+                tbody.appendChild(avisoVacio);
+            }
+            avisoVacio.style.display = '';
+        } else if (avisoVacio) {
+            avisoVacio.style.display = 'none';
         }
-        avisoVacio.style.display = '';
-    } else if(avisoVacio) {
-        avisoVacio.style.display = 'none';
+    } catch (err) {
+        console.error("Error aplicando filtro a tabla:", err);
     }
 }
 
 
 export function construirFilaFiltros(config) {
-    const tbody = document.getElementById(config.tbody);
-    if(!tbody) return;
-    const tabla = tbody.closest('table');
-    const thead = tabla.querySelector('thead');
-    if(!thead || thead.querySelector('tr.fila-filtros')) return;
+    try {
+        const tbody = document.getElementById(config.tbody);
+        if (!tbody) return;
+        const tabla = tbody.closest('table');
+        if (!tabla) return;
 
-    const encabezados = Array.from(thead.rows[0].cells);
-    const fila = document.createElement('tr');
-    fila.className = 'fila-filtros';
-    encabezados.forEach(th => {
-        const celda = document.createElement('th');
-        const titulo = th.textContent.trim();
-        if(titulo && !config.omitir.includes(titulo)) {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'filtro-col';
-            input.placeholder = 'Filtrar…';
-            input.addEventListener('input', () => aplicarFiltrosTabla(tbody));
-            celda.appendChild(input);
-        }
-        fila.appendChild(celda);
-    });
-    thead.appendChild(fila);
+        // Evitar duplicar el buscador si ya existe
+        if (tabla.previousElementSibling && tabla.previousElementSibling.classList.contains('buscador-global-tabla')) return;
 
-    // Cada vez que la app repinta la tabla se pierden los display:none, así
-    // que se vuelve a aplicar el filtro vigente sobre las filas nuevas.
-    new MutationObserver(() => aplicarFiltrosTabla(tbody))
-        .observe(tbody, { childList: true });
+        const buscadorContenedor = document.createElement('div');
+        buscadorContenedor.className = 'buscador-global-tabla';
+        buscadorContenedor.style.marginBottom = '15px';
+        buscadorContenedor.style.position = 'relative';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = '🔍 Buscar en esta tabla...';
+        input.style.width = '100%';
+        input.style.padding = '8px 30px 8px 10px';
+        input.style.boxSizing = 'border-box';
+        input.style.borderRadius = '5px';
+        input.style.border = '1px solid #ccc';
+        input.style.fontSize = '14px';
+
+        const btnLimpiar = document.createElement('button');
+        btnLimpiar.innerHTML = '✕';
+        btnLimpiar.style.position = 'absolute';
+        btnLimpiar.style.right = '5px';
+        btnLimpiar.style.top = '50%';
+        btnLimpiar.style.transform = 'translateY(-50%)';
+        btnLimpiar.style.background = 'none';
+        btnLimpiar.style.border = 'none';
+        btnLimpiar.style.cursor = 'pointer';
+        btnLimpiar.style.fontSize = '14px';
+        btnLimpiar.style.color = '#888';
+        btnLimpiar.style.display = 'none';
+
+        input.addEventListener('input', () => {
+            btnLimpiar.style.display = input.value ? 'block' : 'none';
+            aplicarFiltrosTabla(tbody, input);
+        });
+
+        btnLimpiar.addEventListener('click', () => {
+            input.value = '';
+            btnLimpiar.style.display = 'none';
+            aplicarFiltrosTabla(tbody, input);
+        });
+
+        buscadorContenedor.appendChild(input);
+        buscadorContenedor.appendChild(btnLimpiar);
+
+        tabla.parentNode.insertBefore(buscadorContenedor, tabla);
+
+        // Cada vez que la app repinta la tabla se pierden los display:none, así
+        // que se vuelve a aplicar el filtro vigente sobre las filas nuevas.
+        new MutationObserver(() => aplicarFiltrosTabla(tbody, input))
+            .observe(tbody, { childList: true });
+            
+    } catch (err) {
+        console.error("Error construyendo buscador global:", err);
+    }
 }
 
 
