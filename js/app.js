@@ -489,11 +489,7 @@ window.agregarItemCarrito = Ventas.agregarItemCarrito;
 window.quitarItemCarrito = Ventas.quitarItemCarrito;
 window.sugerirCostoItem = Ventas.sugerirCostoItem;
 window.actualizarSaldoVenta = Ventas.actualizarSaldoVenta;
-window.abrirModalPago = Ventas.abrirModalPago;
-window.ponerSaldoCompleto = Ventas.ponerSaldoCompleto;
-window.guardarPagoModal = Ventas.guardarPagoModal;
-window.abrirModalGuia = Ventas.abrirModalGuia;
-window.guardarGuiaModal = Ventas.guardarGuiaModal;
+
 window.sugerirEnvio = Ventas.sugerirEnvio;
 window.obtenerCiudadesUnicas = Ventas.obtenerCiudadesUnicas;
 window.esGuiaValida = esGuiaValida;
