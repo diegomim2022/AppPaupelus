@@ -359,8 +359,6 @@ export async function agregarVenta(e) {
             }).select();
             if(errPago) console.error(errPago);
 
-            await APP.cargarDatos();
-
             carritoActual.length = 0;
             renderCarrito();
             document.getElementById('vent-fecha').value = hoyISO();
