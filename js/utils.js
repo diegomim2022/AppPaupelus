@@ -11,9 +11,7 @@ const TABLAS_CON_FILTRO = [
     { tbody: 'tabla-ventas-cobro', omitir: ['Acciones'] },
     { tbody: 'tabla-entregas', omitir: ['Acciones'] },
     { tbody: 'tabla-inventario', omitir: [] },
-    { tbody: 'tabla-reporte-fechas', omitir: [] },
-    { tbody: 'tabla-top', omitir: [] },
-    { tbody: 'tabla-empresas', omitir: [] },
+    { tbody: 'tabla-reporte-fechas', omitir: [] }
 ];
 
 
