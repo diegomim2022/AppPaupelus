@@ -959,22 +959,6 @@ function exportarReporteCSV() {
     URL.revokeObjectURL(url);
 }
 
-function exportarInventarioCSV() {
-    const filas = APP._inventarioCache || APP.calcularInventario();
-    if(filas.length === 0) { alert('No hay inventario para exportar'); return; }
-    let csv = 'Referencia,Nombre,Costo Unitario,Cantidad,Valor Total\n';
-    filas.forEach(f => {
-        csv += `${f.ref},"${f.nombre || ''}",${Math.round(f.costoUnitario)},${f.cantidad},${Math.round(f.valorTotal)}\n`;
-    });
-    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `inventario_${hoyISO()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
 
 // ===== FILTROS POR COLUMNA =====
 // Inserta una fila de cajas de búsqueda bajo los encabezados de cada tabla

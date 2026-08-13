@@ -5,7 +5,7 @@ import * as Compras from './compras.js?v=1';
 import * as Ventas from './ventas.js?v=1';
 import { itemsDeVenta, esGuiaValida } from './ventas.js?v=1';
 import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js?v=1';
-
+import * as Inventario from './inventario.js?v=1';
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -167,103 +167,7 @@ export const APP = {
         this.actualizarSeccion(this.seccionActiva());
     },
 
-    // Valora el stock que queda con FIFO: arma los lotes de compra de cada
-    // referencia, los va consumiendo en orden con las ventas ya hechas, y lo
-    // que sobra es el inventario real con el costo de los lotes que quedaron.
-    calcularInventario() {
-        const lotesPorRef = {};
-        this.datos.compras.slice()
-            .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))
-            .forEach(c => {
-                if(!c.ref) return;
-                (lotesPorRef[c.ref] = lotesPorRef[c.ref] || []).push({
-                    cantidad: c.cantidad || 0,
-                    costo_unitario: c.costo_unitario || 0
-                });
-            });
 
-        const vendidoPorRef = {};
-        this.datos.ventas.forEach(v => {
-            itemsDeVenta(v).forEach(it => {
-                if(!it.ref) return;
-                vendidoPorRef[it.ref] = (vendidoPorRef[it.ref] || 0) + (it.cantidad || 0);
-            });
-        });
-
-        const refs = new Set([
-            ...this.datos.productos.map(p => p.ref),
-            ...Object.keys(lotesPorRef)
-        ].filter(Boolean));
-
-        const filas = [];
-        refs.forEach(ref => {
-            const lotes = (lotesPorRef[ref] || []).map(l => ({...l}));
-            let porConsumir = vendidoPorRef[ref] || 0;
-            while(porConsumir > 0 && lotes.length) {
-                const tomar = Math.min(lotes[0].cantidad, porConsumir);
-                lotes[0].cantidad -= tomar;
-                porConsumir -= tomar;
-                if(lotes[0].cantidad <= 0) lotes.shift();
-            }
-
-            const cantidad = lotes.reduce((s, l) => s + l.cantidad, 0);
-            const valorTotal = lotes.reduce((s, l) => s + l.cantidad * l.costo_unitario, 0);
-            const prod = this.datos.productos.find(p => p.ref === ref);
-
-            filas.push({
-                ref,
-                nombre: prod ? prod.nombre : '-',
-                cantidad,
-                // Si quedó stock, el costo unitario es el promedio de los lotes
-                // que siguen en bodega; si no queda nada, se muestra el último
-                // costo de compra conocido como referencia.
-                costoUnitario: cantidad > 0 ? valorTotal / cantidad
-                    : ((lotesPorRef[ref] || []).slice(-1)[0] || {}).costo_unitario || 0,
-                valorTotal,
-                sobrevendido: porConsumir > 0 ? porConsumir : 0
-            });
-        });
-
-        filas.sort((a, b) => b.valorTotal - a.valorTotal || a.ref.localeCompare(b.ref));
-        return filas;
-    },
-
-    actualizarInventario(verTodos) {
-        if(verTodos !== undefined) this._invVerTodos = verTodos;
-        const mostrarTodos = !!this._invVerTodos;
-
-        const btnCon = document.getElementById('inv-btn-con');
-        const btnTodos = document.getElementById('inv-btn-todos');
-        if(btnCon && btnTodos) {
-            btnCon.style.fontWeight = mostrarTodos ? 'normal' : '700';
-            btnTodos.style.fontWeight = mostrarTodos ? '700' : 'normal';
-        }
-
-        const todas = this.calcularInventario();
-        this._inventarioCache = todas;
-        const filas = mostrarTodos ? todas : todas.filter(f => f.cantidad > 0);
-
-        const tabla = document.getElementById('tabla-inventario');
-        if(!tabla) return;
-        tabla.innerHTML = filas.map(f => {
-            const alerta = f.sobrevendido > 0
-                ? ` <span style="color:#c0575c; font-size:11px;" title="Se vendieron más unidades de las compradas">⚠ ${f.sobrevendido} sin respaldo de compra</span>`
-                : '';
-            return `<tr><td><strong>${esc(f.ref)}</strong>${alerta}</td><td>${esc(f.nombre)}</td><td>$${Math.round(f.costoUnitario).toLocaleString('es-CO')}</td><td>${f.cantidad}</td><td>$${Math.round(f.valorTotal).toLocaleString('es-CO')}</td></tr>`;
-        }).join('');
-        if(filas.length === 0) tabla.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Sin stock disponible</td></tr>';
-
-        const totalCant = filas.reduce((s, f) => s + f.cantidad, 0);
-        const totalValor = filas.reduce((s, f) => s + f.valorTotal, 0);
-        const conStock = todas.filter(f => f.cantidad > 0).length;
-
-        document.getElementById('inv-foot-cant').textContent = totalCant;
-        document.getElementById('inv-foot-valor').textContent = '$' + Math.round(totalValor).toLocaleString('es-CO');
-        document.getElementById('inv-valor-total').textContent = '$' + Math.round(todas.reduce((s, f) => s + f.valorTotal, 0)).toLocaleString('es-CO');
-        document.getElementById('inv-unidades').textContent = todas.reduce((s, f) => s + f.cantidad, 0);
-        document.getElementById('inv-refs').textContent = conStock;
-        document.getElementById('inv-refs-label').textContent = 'de ' + todas.length + ' referencias';
-    },
 
     actualizarProductos() {
         const tabla = document.getElementById('tabla-productos');
@@ -494,3 +398,6 @@ window.sugerirEnvio = Ventas.sugerirEnvio;
 window.obtenerCiudadesUnicas = Ventas.obtenerCiudadesUnicas;
 window.esGuiaValida = esGuiaValida;
 
+APP.calcularInventario = Inventario.calcularInventario;
+APP.actualizarInventario = Inventario.actualizarInventario;
+window.exportarInventarioCSV = Inventario.exportarInventarioCSV;
