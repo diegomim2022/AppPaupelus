@@ -115,18 +115,6 @@ export const APP = {
             });
         });
 
-        ['prod', 'comp', 'vent', 'ent'].forEach(tipo => {
-            const search = document.getElementById('search-' + tipo);
-            if(search) search.addEventListener('keyup', () => this.buscar(tipo));
-        });
-
-        const searchInv = document.getElementById('search-inv');
-        if(searchInv) searchInv.addEventListener('keyup', () => {
-            const q = searchInv.value.toLowerCase();
-            Array.from(document.getElementById('tabla-inventario').querySelectorAll('tr')).forEach(fila => {
-                fila.style.display = fila.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        });
 
         const hoy = hoyISO();
         if(document.getElementById('comp-fecha')) document.getElementById('comp-fecha').value = hoy;
@@ -137,14 +125,6 @@ export const APP = {
         inicializarAutocompleteCliente('vent-cliente', 'vent-cliente-list');
         inicializarAutocompleteCiudad('vent-ciudad', 'vent-ciudad-list');
         inicializarFiltrosTablas();
-    },
-
-    buscar(tipo) {
-        const input = document.getElementById('search-' + tipo).value.toLowerCase();
-        const tabla = document.getElementById('tabla-' + (tipo === 'prod' ? 'productos' : tipo === 'comp' ? 'compras' : tipo === 'vent' ? 'ventas' : 'entregas'));
-        Array.from(tabla.querySelectorAll('tr')).forEach(fila => {
-            fila.style.display = fila.textContent.toLowerCase().includes(input) ? '' : 'none';
-        });
     },
 
     seccionActiva() {

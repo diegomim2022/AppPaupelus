@@ -302,31 +302,59 @@ export function construirFilaFiltros(config) {
 
         const buscadorContenedor = document.createElement('div');
         buscadorContenedor.className = 'buscador-global-tabla';
-        buscadorContenedor.style.marginBottom = '15px';
+        buscadorContenedor.style.margin = '0 auto 15px auto'; // Centrado horizontal
         buscadorContenedor.style.position = 'relative';
+        buscadorContenedor.style.width = '60%'; // 60% del ancho
+        buscadorContenedor.style.maxWidth = '600px';
+        buscadorContenedor.style.minWidth = '300px';
+
+        const iconoLupa = document.createElement('span');
+        iconoLupa.innerHTML = '🔍';
+        iconoLupa.style.position = 'absolute';
+        iconoLupa.style.left = '12px';
+        iconoLupa.style.top = '50%';
+        iconoLupa.style.transform = 'translateY(-50%)';
+        iconoLupa.style.color = '#888';
+        iconoLupa.style.pointerEvents = 'none';
 
         const input = document.createElement('input');
         input.type = 'text';
-        input.placeholder = '🔍 Buscar en esta tabla...';
+        input.placeholder = 'Buscar en esta tabla...';
         input.style.width = '100%';
-        input.style.padding = '8px 30px 8px 10px';
+        input.style.padding = '12px 35px 12px 35px'; // Espacio para la lupa y el botón de limpiar
         input.style.boxSizing = 'border-box';
-        input.style.borderRadius = '5px';
-        input.style.border = '1px solid #ccc';
-        input.style.fontSize = '14px';
+        input.style.borderRadius = '20px'; // Estilo moderno y redondeado
+        input.style.border = '1px solid #eecfdc';
+        input.style.fontSize = '15px';
+        input.style.outline = 'none';
+        input.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+        input.style.transition = 'box-shadow 0.2s, border-color 0.2s';
+        
+        input.addEventListener('focus', () => {
+            input.style.borderColor = '#f4a9c4';
+            input.style.boxShadow = '0 0 0 3px rgba(244,169,196,0.2)';
+        });
+        input.addEventListener('blur', () => {
+            input.style.borderColor = '#eecfdc';
+            input.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+        });
 
         const btnLimpiar = document.createElement('button');
         btnLimpiar.innerHTML = '✕';
         btnLimpiar.style.position = 'absolute';
-        btnLimpiar.style.right = '5px';
+        btnLimpiar.style.right = '12px';
         btnLimpiar.style.top = '50%';
         btnLimpiar.style.transform = 'translateY(-50%)';
         btnLimpiar.style.background = 'none';
         btnLimpiar.style.border = 'none';
         btnLimpiar.style.cursor = 'pointer';
         btnLimpiar.style.fontSize = '14px';
-        btnLimpiar.style.color = '#888';
+        btnLimpiar.style.color = '#aaa';
         btnLimpiar.style.display = 'none';
+        btnLimpiar.style.padding = '5px';
+        
+        btnLimpiar.addEventListener('mouseenter', () => btnLimpiar.style.color = '#555');
+        btnLimpiar.addEventListener('mouseleave', () => btnLimpiar.style.color = '#aaa');
 
         input.addEventListener('input', () => {
             btnLimpiar.style.display = input.value ? 'block' : 'none';
@@ -336,9 +364,11 @@ export function construirFilaFiltros(config) {
         btnLimpiar.addEventListener('click', () => {
             input.value = '';
             btnLimpiar.style.display = 'none';
+            input.focus();
             aplicarFiltrosTabla(tbody, input);
         });
 
+        buscadorContenedor.appendChild(iconoLupa);
         buscadorContenedor.appendChild(input);
         buscadorContenedor.appendChild(btnLimpiar);
 
