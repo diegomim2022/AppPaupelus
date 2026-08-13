@@ -277,7 +277,7 @@ window.esGuiaValida = esGuiaValida;
 
 APP.calcularInventario = Inventario.calcularInventario;
 APP.actualizarInventario = Inventario.actualizarInventario;
-window.exportarInventarioCSV = Inventario.exportarInventarioCSV;
+window.exportarInventarioExcel = Inventario.exportarInventarioExcel;
 
 // Reportes/Dashboard
 APP.actualizarDashboard = Reportes.actualizarDashboard;

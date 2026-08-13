@@ -112,22 +112,31 @@ export function actualizarInventario(verTodos) {
     }
 }
 
-export function exportarInventarioCSV() {
+export function exportarInventarioExcel() {
     try {
+        if (typeof XLSX === 'undefined') {
+            alert('La librería de Excel aún no ha cargado. Por favor espera un segundo y vuelve a intentar.');
+            return;
+        }
+
         const filas = _inventarioCache.length > 0 ? _inventarioCache : calcularInventario();
         if(filas.length === 0) { alert('No hay inventario para exportar'); return; }
-        let csv = 'Referencia,Nombre,Costo Unitario,Cantidad,Valor Total\n';
-        filas.forEach(f => {
-            csv += `${f.ref},"${f.nombre || ''}",${Math.round(f.costoUnitario)},${f.cantidad},${Math.round(f.valorTotal)}\n`;
-        });
-        const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `inventario_${hoyISO()}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+
+        // Formatear los datos para SheetJS
+        const datosExcel = filas.map(f => ({
+            "Referencia": f.ref,
+            "Nombre": f.nombre || '',
+            "Costo Unitario": Math.round(f.costoUnitario),
+            "Cantidad": f.cantidad,
+            "Valor Total": Math.round(f.valorTotal)
+        }));
+
+        const hoja = XLSX.utils.json_to_sheet(datosExcel);
+        const libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hoja, "Inventario");
+        
+        XLSX.writeFile(libro, `Inventario_${hoyISO()}.xlsx`);
     } catch (error) {
-        console.error("Error en exportarInventarioCSV:", error);
+        console.error("Error en exportarInventarioExcel:", error);
     }
 }
