@@ -1,6 +1,6 @@
 import { APP } from './app.js';
 import { esc, hoyISO } from './utils.js';
-import { itemsDeVenta } from './ventas.js?v=1';
+import { itemsDeVenta } from './ventas.js';
 
 let _inventarioCache = [];
 let _invVerTodos = false;

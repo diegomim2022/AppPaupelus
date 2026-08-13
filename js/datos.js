@@ -1,6 +1,6 @@
 import { supabaseClient } from './db.js';
-import { APP } from './app.js?v=1';
-import { hoyISO } from './utils.js?v=1';
+import { APP } from './app.js';
+import { hoyISO } from './utils.js';
 
 export function exportarJSON() {
     try {

@@ -1,13 +1,13 @@
 import { supabaseClient } from './db.js';
 import { esc, formatMiles, leerMiles, ponerMiles, formatearFecha, aISOLocal, hoyISO, parsearFechaLocal, rangoRapido, cerrarModal, inicializarAutocomplete, inicializarAutocompleteCliente, inicializarAutocompleteCiudad, aplicarFiltrosTabla, construirFilaFiltros, inicializarFiltrosTablas } from './utils.js';
-import * as Productos from './productos.js?v=1';
-import * as Compras from './compras.js?v=1';
-import * as Ventas from './ventas.js?v=1';
-import { itemsDeVenta, esGuiaValida } from './ventas.js?v=1';
-import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js?v=1';
-import * as Inventario from './inventario.js?v=1';
-import * as Reportes from './reportes.js?v=1';
-import * as Datos from './datos.js?v=1';
+import * as Productos from './productos.js';
+import * as Compras from './compras.js';
+import * as Ventas from './ventas.js';
+import { itemsDeVenta, esGuiaValida } from './ventas.js';
+import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js';
+import * as Inventario from './inventario.js';
+import * as Reportes from './reportes.js';
+import * as Datos from './datos.js';
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -209,7 +209,7 @@ export const APP = {
         if(!confirm('¿Eliminar producto?')) return;
         const { error } = await supabaseClient.from('productos').delete().eq('id', id);
         if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
-        this.datos.productos = this.datos.productos.filter(p => p.id !== id);
+        this.datos.productos = this.datos.productos.filter(p => String(p.id) !== String(id));
         this.actualizarProductos();
     },
 
@@ -217,7 +217,7 @@ export const APP = {
         if(!confirm('¿Eliminar compra?')) return;
         const { error } = await supabaseClient.from('compras').delete().eq('id', id);
         if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
-        this.datos.compras = this.datos.compras.filter(c => c.id !== id);
+        this.datos.compras = this.datos.compras.filter(c => String(c.id) !== String(id));
         this.actualizarTodo();
     },
 
@@ -228,8 +228,8 @@ export const APP = {
         // en supabase_schema.sql.
         const { error } = await supabaseClient.from('ventas').delete().eq('id', id);
         if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
-        this.datos.ventas = this.datos.ventas.filter(v => v.id !== id);
-        this.datos.entregas = this.datos.entregas.filter(e => e.venta_id !== id);
+        this.datos.ventas = this.datos.ventas.filter(v => String(v.id) !== String(id));
+        this.datos.entregas = this.datos.entregas.filter(e => String(e.venta_id) !== String(id));
         this.actualizarTodo();
     }
 };

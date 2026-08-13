@@ -1,7 +1,7 @@
-import { esc, formatearFecha, parsearFechaLocal, hoyISO } from './utils.js?v=1';
-import { APP } from './app.js?v=1';
-import { itemsDeVenta } from './ventas.js?v=1';
-import { calcularInventario } from './inventario.js?v=1';
+import { esc, formatearFecha, parsearFechaLocal, hoyISO } from './utils.js';
+import { APP } from './app.js';
+import { itemsDeVenta } from './ventas.js';
+import { calcularInventario } from './inventario.js';
 
 // Estado local protegido para Reportes
 let _chartMesesActual = 1;

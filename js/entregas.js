@@ -1,7 +1,7 @@
 import { APP } from './app.js';
 import { supabaseClient } from './db.js';
 import { cerrarModal, esc, formatearFecha, parsearFechaLocal, leerMiles, ponerMiles, hoyISO } from './utils.js';
-import { esGuiaValida } from './ventas.js?v=1';
+import { esGuiaValida } from './ventas.js';
 
 export function actualizarEntregas() {
     try {
