@@ -2,6 +2,9 @@ import { supabaseClient, cargarDatos, exportarJSON, limpiarTodo, actualizarEstad
 import { esc, formatMiles, leerMiles, ponerMiles, formatearFecha, aISOLocal, hoyISO, parsearFechaLocal, rangoRapido, cerrarModal, inicializarAutocomplete, inicializarAutocompleteCliente, inicializarAutocompleteCiudad, aplicarFiltrosTabla, construirFilaFiltros, inicializarFiltrosTablas } from './utils.js';
 import * as Productos from './productos.js?v=1';
 import * as Compras from './compras.js?v=1';
+import * as Ventas from './ventas.js?v=1';
+import { itemsDeVenta, esGuiaValida } from './ventas.js?v=1';
+
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -290,24 +293,7 @@ export const APP = {
     },
 
     actualizarVentas() {
-        const pintarTabla = (tbodyId, ventas, mensajeVacio) => {
-            const tbody = document.getElementById(tbodyId);
-            if(!tbody) return;
-            tbody.innerHTML = ventas.map(v => `<tr>${filaVentaHTML(v)}</tr>`).join('');
-            if(ventas.length === 0) tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: #999;">${mensajeVacio}</td></tr>`;
-        };
-
-        const ordenadas = [...this.datos.ventas].sort((a, b) => b.fecha.localeCompare(a.fecha));
-        pintarTabla('tabla-ventas', ordenadas, 'Sin ventas registradas');
-
-        const envioPendiente = ordenadas.filter(v => {
-            const entrega = this.datos.entregas.find(e => e.venta_id === v.id);
-            return entrega && !esGuiaValida(entrega.guia);
-        });
-        pintarTabla('tabla-ventas-envios', envioPendiente, 'No hay envíos pendientes de asignar guía 🎉');
-
-        const cobroPendiente = ordenadas.filter(v => v.saldo > 0);
-        pintarTabla('tabla-ventas-cobro', cobroPendiente, 'No hay saldos pendientes por cobrar 🎉');
+        Ventas.actualizarVentas();
     },
 
     actualizarEntregas() {
@@ -518,3 +504,20 @@ window.quitarItemCompra = Compras.quitarItemCompra;
 window.agregarCompra = Compras.agregarCompra;
 window.editarCompra = Compras.editarCompra;
 window.cancelarEdicionCompra = Compras.cancelarEdicionCompra;
+
+window.agregarVenta = Ventas.agregarVenta;
+window.editarVenta = Ventas.editarVenta;
+window.cancelarEdicionVenta = Ventas.cancelarEdicionVenta;
+window.agregarItemCarrito = Ventas.agregarItemCarrito;
+window.quitarItemCarrito = Ventas.quitarItemCarrito;
+window.sugerirCostoItem = Ventas.sugerirCostoItem;
+window.actualizarSaldoVenta = Ventas.actualizarSaldoVenta;
+window.abrirModalPago = Ventas.abrirModalPago;
+window.ponerSaldoCompleto = Ventas.ponerSaldoCompleto;
+window.guardarPagoModal = Ventas.guardarPagoModal;
+window.abrirModalGuia = Ventas.abrirModalGuia;
+window.guardarGuiaModal = Ventas.guardarGuiaModal;
+window.sugerirEnvio = Ventas.sugerirEnvio;
+window.obtenerCiudadesUnicas = Ventas.obtenerCiudadesUnicas;
+window.esGuiaValida = esGuiaValida;
+
