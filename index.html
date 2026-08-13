@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -480,6 +480,7 @@
                     <button type="button" class="btn-small" onclick="APP.actualizarInventario(false)" id="inv-btn-con">📦 Solo con stock</button>
                     <button type="button" class="btn-small" onclick="APP.actualizarInventario(true)" id="inv-btn-todos">📋 Ver todas las referencias</button>
                     <button type="button" class="btn" onclick="exportarInventarioExcel()">📥 Exportar Excel</button>
+                    <button type="button" class="btn-small" title="Fuerza un recálculo completo del inventario desde cero" onclick="APP.marcarInventarioSucio(); APP.actualizarTodo();">🔄 Recalcular</button>
                 </div>
 
                 <div class="search-box">

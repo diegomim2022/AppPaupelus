@@ -88,6 +88,7 @@ export async function agregarCompra(e) {
             if(error) { alert('❌ Error al actualizar: ' + error.message); return; }
             const c = APP.datos.compras.find(x => x.id === editId);
             if(c) Object.assign(c, cambios);
+            APP.marcarInventarioSucio(); // Punto 1 de invalidación
             cancelarEdicionCompra();
             alert('✅ Compra actualizada');
         } else {
@@ -99,6 +100,7 @@ export async function agregarCompra(e) {
             const { data, error } = await supabaseClient.from('compras').insert(registros).select();
             if(error) { alert('❌ Error al registrar: ' + error.message); return; }
             data.forEach(d => APP.datos.compras.push(d));
+            APP.marcarInventarioSucio(); // Punto 2 de invalidación
             carritoCompra = [];
             renderCarritoCompra();
             e.target.reset();

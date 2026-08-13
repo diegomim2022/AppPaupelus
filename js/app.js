@@ -82,6 +82,14 @@ export const APP = {
         entregas: []
     },
 
+    // Dirty flag: indica que el inventario FIFO debe recalcularse.
+    // Se pone en true en cualquier punto que mute compras o ventas.
+    inventarioDirty: true,
+
+    marcarInventarioSucio() {
+        this.inventarioDirty = true;
+    },
+
     async init() {
         const ok = await this.cargarDatos();
         if(!ok) return;
@@ -185,6 +193,7 @@ export const APP = {
         const { error } = await supabaseClient.from('compras').delete().eq('id', id);
         if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
         this.datos.compras = this.datos.compras.filter(c => String(c.id) !== String(id));
+        this.marcarInventarioSucio(); // Punto 3 de invalidación
         this.actualizarTodo();
     },
 
@@ -197,6 +206,7 @@ export const APP = {
         if(error) { alert('❌ Error al eliminar: ' + error.message); return; }
         this.datos.ventas = this.datos.ventas.filter(v => String(v.id) !== String(id));
         this.datos.entregas = this.datos.entregas.filter(e => String(e.venta_id) !== String(id));
+        this.marcarInventarioSucio(); // Punto 4 de invalidación
         this.actualizarTodo();
     }
 };

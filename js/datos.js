@@ -41,6 +41,7 @@ export async function limpiarTodo() {
         }
         
         // Solo si la BD se borró correctamente procedemos a limpiar el estado local
+        APP.marcarInventarioSucio(); // Punto 5 de invalidación
         APP.datos.productos = [];
         APP.datos.clientes = [];
         APP.datos.compras = [];
@@ -100,6 +101,8 @@ export async function cargarDatos() {
         this.datos.entregas = (rEnt.data || []).map(e => ({
             ...e, cliente: e.cliente_nombre, pagos: pagosPorEntrega[e.id] || []
         }));
+        // Los datos cambiaron: el caché de inventario FIFO es inválido
+        this.marcarInventarioSucio();
         return true;
     } catch(x) {
         console.error("Error en cargarDatos:", x);

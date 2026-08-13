@@ -8,8 +8,15 @@ let _invVerTodos = false;
 // Valora el stock que queda con FIFO: arma los lotes de compra de cada
 // referencia, los va consumiendo en orden con las ventas ya hechas, y lo
 // que sobra es el inventario real con el costo de los lotes que quedaron.
+// El resultado se guarda en caché (_inventarioCache) y solo se recalcula
+// cuando APP.inventarioDirty === true (señalado por marcarInventarioSucio()).
 export function calcularInventario() {
     try {
+        // --- Caché: reusar si los datos no cambiaron ---
+        if (!APP.inventarioDirty && _inventarioCache.length > 0) {
+            return _inventarioCache;
+        }
+
         const lotesPorRef = {};
         APP.datos.compras.slice()
             .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))
@@ -64,6 +71,11 @@ export function calcularInventario() {
         });
 
         filas.sort((a, b) => b.valorTotal - a.valorTotal || a.ref.localeCompare(b.ref));
+
+        // --- Guardar en caché y marcar como limpio ---
+        _inventarioCache = filas;
+        APP.inventarioDirty = false;
+
         return filas;
     } catch (error) {
         console.error("Error en calcularInventario:", error);
