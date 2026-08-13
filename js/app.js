@@ -1,4 +1,4 @@
-import { supabaseClient, cargarDatos, exportarJSON, limpiarTodo, actualizarEstadoDatos } from './db.js';
+import { supabaseClient } from './db.js';
 import { esc, formatMiles, leerMiles, ponerMiles, formatearFecha, aISOLocal, hoyISO, parsearFechaLocal, rangoRapido, cerrarModal, inicializarAutocomplete, inicializarAutocompleteCliente, inicializarAutocompleteCiudad, aplicarFiltrosTabla, construirFilaFiltros, inicializarFiltrosTablas } from './utils.js';
 import * as Productos from './productos.js?v=1';
 import * as Compras from './compras.js?v=1';
@@ -7,6 +7,7 @@ import { itemsDeVenta, esGuiaValida } from './ventas.js?v=1';
 import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js?v=1';
 import * as Inventario from './inventario.js?v=1';
 import * as Reportes from './reportes.js?v=1';
+import * as Datos from './datos.js?v=1';
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -234,15 +235,15 @@ export const APP = {
 };
 
 APP.actualizarEntregas = actualizarEntregas;
-APP.cargarDatos = cargarDatos;
-
+APP.cargarDatos = Datos.cargarDatos;
+APP.actualizarEstadoDatos = Datos.actualizarEstadoDatos;
 
 window.APP = APP;
 window.iniciarSesion = iniciarSesion;
 window.cerrarSesion = cerrarSesion;
 window.cambiarTab = cambiarTab;
-window.exportarJSON = exportarJSON;
-window.limpiarTodo = limpiarTodo;
+window.exportarJSON = Datos.exportarJSON;
+window.limpiarTodo = Datos.limpiarTodo;
 window.cerrarModal = cerrarModal;
 window.formatMiles = formatMiles;
 window.rangoRapido = rangoRapido;
@@ -251,8 +252,8 @@ window.ponerSaldoCompleto = ponerSaldoCompleto;
 window.guardarPagoModal = guardarPagoModal;
 window.abrirModalGuia = abrirModalGuia;
 window.guardarGuiaModal = guardarGuiaModal;
-window.actualizarEstadoDatos = actualizarEstadoDatos;
-window.cargarDatos = cargarDatos;
+window.actualizarEstadoDatos = Datos.actualizarEstadoDatos;
+window.cargarDatos = Datos.cargarDatos;
 window.esc = esc;
 window.leerMiles = leerMiles;
 window.ponerMiles = ponerMiles;
