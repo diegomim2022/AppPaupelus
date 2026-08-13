@@ -373,12 +373,9 @@ export async function agregarVenta(e) {
             alert(`✅ Venta registrada con ${items.length} producto(s)`);
         }
         
-        console.log("1. Antes de await APP.cargarDatos()");
         await APP.cargarDatos();
-        console.log("2. Después de await APP.cargarDatos(), datos recargados.");
         APP.actualizarTodo();
-        APP.actualizarEntregas(); 
-        console.log("3. Fin de agregarVenta() - vistas actualizadas.");
+        APP.actualizarEntregas();
     } catch (err) {
         console.error("Error capturado en agregarVenta:", err);
         alert("Ocurrió un error inesperado al guardar la venta. Revisa la consola.");
