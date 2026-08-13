@@ -3,7 +3,7 @@ import { esc, formatMiles, leerMiles, ponerMiles, formatearFecha, aISOLocal, hoy
 import * as Productos from './productos.js';
 import * as Compras from './compras.js';
 import * as Ventas from './ventas.js';
-import { itemsDeVenta, esGuiaValida } from './ventas.js';
+import { esGuiaValida } from './ventas.js';
 import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js';
 import * as Inventario from './inventario.js';
 import * as Reportes from './reportes.js';
@@ -95,13 +95,6 @@ export const APP = {
         this.actualizarReportes();
         if(typeof actualizarEstadoDatos === 'function') actualizarEstadoDatos();
     },
-
-    // Trae las 6 tablas de Supabase y las arma en la misma forma en memoria
-    // que usa el resto de la app (items[] agrupados por venta, pagos[]
-    // agrupados por entrega, "cliente_nombre" -> "cliente" para no tener
-    // que tocar cada función de renderizado existente).
-
-
 
     conectarEventos() {
         document.querySelectorAll('.nav-btn').forEach(btn => {

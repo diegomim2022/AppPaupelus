@@ -1,5 +1,5 @@
 import { APP } from './app.js';
-import { cerrarModal, esc, formatMiles, leerMiles, ponerMiles } from './utils.js';
+import { esc, leerMiles, ponerMiles } from './utils.js';
 import { supabaseClient } from './db.js';
 
 

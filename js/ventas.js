@@ -1,6 +1,6 @@
 import { APP } from './app.js';
 import { supabaseClient } from './db.js';
-import { esc, formatearFecha, leerMiles, ponerMiles, hoyISO, cerrarModal, formatMiles, parsearFechaLocal } from './utils.js';
+import { esc, formatearFecha, leerMiles, ponerMiles, hoyISO, parsearFechaLocal } from './utils.js';
 
 export let carritoActual = [];
 
