@@ -868,12 +868,7 @@ function actualizarListaProveedores() {
     dl.innerHTML = unicos.map(p => `<option value="${esc(p)}"></option>`).join('');
 }
 
-function actualizarListaEmpresas() {
-    const dl = document.getElementById('lista-empresas');
-    if(!dl) return;
-    const unicos = [...new Set(APP.datos.entregas.map(e => e.empresa).filter(emp => emp && emp.trim() && emp !== 'Por definir'))].sort();
-    dl.innerHTML = unicos.map(emp => `<option value="${esc(emp)}"></option>`).join('');
-}
+
 
 
 

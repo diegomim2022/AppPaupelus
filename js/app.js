@@ -4,6 +4,7 @@ import * as Productos from './productos.js?v=1';
 import * as Compras from './compras.js?v=1';
 import * as Ventas from './ventas.js?v=1';
 import { itemsDeVenta, esGuiaValida } from './ventas.js?v=1';
+import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModal, abrirModalGuia, guardarGuiaModal } from './entregas.js?v=1';
 
 
 let appIniciada = false;
@@ -296,37 +297,7 @@ export const APP = {
         Ventas.actualizarVentas();
     },
 
-    actualizarEntregas() {
-        console.log("-> Ejecutando actualizarEntregas(). Entregas en memoria:", this.datos.entregas.length);
-        const tabla = document.getElementById('tabla-entregas');
-        tabla.innerHTML = '';
-        const ordenadas = [...this.datos.entregas].sort((a, b) => b.fecha.localeCompare(a.fecha));
-        ordenadas.forEach(e => {
-            const dias = Math.floor((new Date() - parsearFechaLocal(e.fecha)) / (1000 * 60 * 60 * 24));
-            const guiaAsignada = esGuiaValida(e.guia) ? e.guia : 'Sin asignar';
-            const estadoClass = e.saldo === 0 ? 'color:#2e7d5c;font-weight:bold;' : 'color:#c0575c;';
-            const fila = document.createElement('tr');
-            
-            const venta = this.datos.ventas.find(v => v.id === e.venta_id);
-            const numVenta = venta ? venta.numero : '-';
-            
-            fila.innerHTML = `<td><strong>${esc(guiaAsignada)}</strong></td><td>#${numVenta}</td><td>${esc(e.cliente)}</td><td>${formatearFecha(e.fecha)}</td><td>$${e.monto.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${e.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="${estadoClass}">$${e.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(e.empresa) || 'Por definir'}</td><td>${e.saldo === 0 ? '✅ Pagado' : '⏳ Pendiente'}</td><td>${dias}d</td><td><button class="btn-small" onclick="abrirModalPago('${esc(e.id)}')" title="Registrar pago" ${e.saldo === 0 ? 'disabled style="opacity:0.4"' : ''}>💵</button> <button class="btn-small" onclick="abrirModalGuia('${esc(e.id)}')" title="Asignar guía">🏷️</button></td>`;
-            tabla.appendChild(fila);
-        });
-        if(this.datos.entregas.length === 0) tabla.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #999;">Sin entregas registradas</td></tr>';
 
-        const recibido = this.datos.entregas.reduce((sum, e) => sum + e.abono, 0);
-        const total = this.datos.entregas.reduce((sum, e) => sum + e.monto, 0);
-        const transito = total - recibido;
-        const hoy = new Date();
-        const vencido = this.datos.entregas.filter(e => e.saldo > 0 && (hoy - parsearFechaLocal(e.fecha)) > 30 * 24 * 60 * 60 * 1000).reduce((sum, e) => sum + e.saldo, 0);
-
-        document.getElementById('ent-recibido').textContent = '$' + recibido.toLocaleString('es-CO', {maximumFractionDigits: 0});
-        document.getElementById('ent-transito').textContent = '$' + transito.toLocaleString('es-CO', {maximumFractionDigits: 0});
-        document.getElementById('ent-vencido').textContent = '$' + vencido.toLocaleString('es-CO', {maximumFractionDigits: 0});
-
-        actualizarListaEmpresas();
-    },
 
     actualizarDashboard() {
         const hoy = new Date();
@@ -463,6 +434,7 @@ export const APP = {
     }
 };
 
+APP.actualizarEntregas = actualizarEntregas;
 APP.cargarDatos = cargarDatos;
 
 
@@ -475,6 +447,11 @@ window.limpiarTodo = limpiarTodo;
 window.cerrarModal = cerrarModal;
 window.formatMiles = formatMiles;
 window.rangoRapido = rangoRapido;
+window.abrirModalPago = abrirModalPago;
+window.ponerSaldoCompleto = ponerSaldoCompleto;
+window.guardarPagoModal = guardarPagoModal;
+window.abrirModalGuia = abrirModalGuia;
+window.guardarGuiaModal = guardarGuiaModal;
 window.actualizarEstadoDatos = actualizarEstadoDatos;
 window.cargarDatos = cargarDatos;
 window.esc = esc;
