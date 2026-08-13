@@ -1,4 +1,4 @@
-import { supabaseClient } from './db.js?v=1';
+import { supabaseClient } from './db.js';
 import { APP } from './app.js?v=1';
 import { hoyISO } from './utils.js?v=1';
 
