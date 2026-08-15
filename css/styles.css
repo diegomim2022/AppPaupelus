@@ -74,8 +74,8 @@ h3 { color: #666; margin: 20px 0 15px 0; }
     transition: background-color 0.2s; 
 }
 .fila-marcada { position: relative; }
-.fila-rojo { border-left: 4px solid #e53935; background-color: #ffebee; }
-.fila-rosado { border-left: 4px solid #1e88e5; background-color: #e3f2fd; }
+.fila-rojo { border-left: 4px solid #e53935; background: linear-gradient(90deg, #ffcdd2 0%, #ffffff 100%); }
+.fila-rosado { border-left: 4px solid #1e88e5; background: linear-gradient(90deg, #bbdefb 0%, #ffffff 100%); }
 
 .dot-marcador { 
   display: inline-block; 
@@ -86,7 +86,7 @@ h3 { color: #666; margin: 20px 0 15px 0; }
   cursor: pointer; 
   vertical-align: middle;
   margin-left: 6px;
-  margin-right: 8px;
+  margin-right: 14px;
 }
 .dot-marcador.activo-rojo { background-color: #e53935; border-color: #e53935; }
 .dot-marcador.activo-rosado { background-color: #1e88e5; border-color: #1e88e5; }
