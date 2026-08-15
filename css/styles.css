@@ -68,3 +68,14 @@ h3 { color: #666; margin: 20px 0 15px 0; }
     header { flex-direction: column; }
     .grid { grid-template-columns: 1fr; }
 }
+
+.fila-venta { 
+    cursor: pointer; 
+    transition: background-color 0.2s; 
+}
+.fila-rojo { 
+    background-color: #ffebee !important; 
+}
+.fila-rosado { 
+    background-color: #fce4ec !important; 
+}

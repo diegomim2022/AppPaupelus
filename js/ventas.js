@@ -433,7 +433,7 @@ export function actualizarVentas() {
     const pintarTabla = (tbodyId, ventas, mensajeVacio) => {
         const tbody = document.getElementById(tbodyId);
         if(!tbody) return;
-        tbody.innerHTML = ventas.map(v => `<tr>${filaVentaHTML(v)}</tr>`).join('');
+        tbody.innerHTML = ventas.map(v => `<tr class="fila-venta${v.marcador === 'rojo' ? ' fila-rojo' : v.marcador === 'rosado' ? ' fila-rosado' : ''}" data-venta-id="${esc(v.id)}" onclick="APP.alternarMarcador('${esc(v.id)}');">${filaVentaHTML(v)}</tr>`).join('');
         if(ventas.length === 0) tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: #999;">${mensajeVacio}</td></tr>`;
     };
 
@@ -448,4 +448,38 @@ export function actualizarVentas() {
 
     const cobroPendiente = ordenadas.filter(v => v.saldo > 0);
     pintarTabla('tabla-ventas-cobro', cobroPendiente, 'No hay saldos pendientes por cobrar 🎉');
+}
+
+export function alternarMarcador(ventaId) {
+    const venta = APP.datos.ventas.find(v => v.id === ventaId);
+    if (!venta) return;
+
+    let nuevoValor = null;
+    if (!venta.marcador) {
+        nuevoValor = 'rojo';
+    } else if (venta.marcador === 'rojo') {
+        nuevoValor = 'rosado';
+    } else {
+        nuevoValor = null;
+    }
+
+    venta.marcador = nuevoValor;
+    actualizarVentas();
+    guardarMarcador(ventaId, nuevoValor);
+}
+
+export async function guardarMarcador(ventaId, marcador) {
+    try {
+        const { error } = await supabaseClient
+            .from('ventas')
+            .update({ marcador: marcador })
+            .eq('id', ventaId);
+
+        if (error) {
+            console.error("Error guardando marcador:", error);
+            alert("No se pudo guardar el resaltado de la fila.");
+        }
+    } catch (err) {
+        console.error("Excepción en guardarMarcador:", err);
+    }
 }
