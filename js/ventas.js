@@ -462,8 +462,8 @@ export function abrirMenuMarcador(event, ventaId) {
     menu.id = 'menu-marcador-flotante';
     menu.className = 'menu-marcador abierto';
     
-    menu.style.left = `${event.clientX}px`;
-    menu.style.top = `${event.clientY + 15}px`; 
+    menu.style.left = `${event.clientX + window.scrollX}px`;
+    menu.style.top = `${event.clientY + window.scrollY + 15}px`; 
 
     menu.innerHTML = `
         <div onclick="APP.seleccionarMarcador('${esc(ventaId)}', null)">Sin marcar</div>
