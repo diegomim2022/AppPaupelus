@@ -73,9 +73,39 @@ h3 { color: #666; margin: 20px 0 15px 0; }
     cursor: pointer; 
     transition: background-color 0.2s; 
 }
-.fila-rojo { 
-    background-color: #ffcdd2 !important; 
+.fila-marcada { position: relative; }
+.fila-rojo { border-left: 4px solid #e53935; }
+.fila-rosado { border-left: 4px solid #1e88e5; }
+
+.dot-marcador { 
+  display: inline-block; 
+  width: 12px; 
+  height: 12px; 
+  border-radius: 50%; 
+  border: 2px solid #ccc; 
+  cursor: pointer; 
+  vertical-align: middle;
+  margin-left: 6px;
 }
-.fila-rosado { 
-    background-color: #f8bbd0 !important; 
+.dot-marcador.activo-rojo { background-color: #e53935; border-color: #e53935; }
+.dot-marcador.activo-rosado { background-color: #1e88e5; border-color: #1e88e5; }
+
+.menu-marcador {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 4px;
+  z-index: 1000;
+  display: none;
 }
+.menu-marcador.abierto { display: block; }
+.menu-marcador div {
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+  border-radius: 4px;
+}
+.menu-marcador div:hover { background-color: #f0f0f0; }

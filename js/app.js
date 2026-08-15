@@ -214,7 +214,8 @@ export const APP = {
 APP.actualizarEntregas = actualizarEntregas;
 APP.cargarDatos = Datos.cargarDatos;
 APP.actualizarEstadoDatos = Datos.actualizarEstadoDatos;
-APP.alternarMarcador = Ventas.alternarMarcador;
+APP.abrirMenuMarcador = Ventas.abrirMenuMarcador;
+APP.seleccionarMarcador = Ventas.seleccionarMarcador;
 
 window.APP = APP;
 window.iniciarSesion = iniciarSesion;

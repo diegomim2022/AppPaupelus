@@ -100,7 +100,7 @@ export function filaVentaHTML(v) {
         return `<strong>${esc(it.ref)}</strong>${nombre ? ' ' + esc(nombre) : ''} x${it.cantidad}`;
     }).join(', ');
     const clienteReal = v.cliente_id ? (v.cliente || v.cliente_nombre || '') : '';
-    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(clienteReal)}</td><td>${esc(normalizarCiudad(v.ciudad)) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><button class="btn-small" onclick="editarVenta('${esc(v.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${esc(v.id)}')">🗑️</button></td>`;
+    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(clienteReal)}</td><td>${esc(normalizarCiudad(v.ciudad)) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><span class="dot-marcador ${v.marcador === 'rojo' ? 'activo-rojo' : v.marcador === 'rosado' ? 'activo-rosado' : ''}" onclick="event.stopPropagation(); APP.abrirMenuMarcador(event, '${esc(v.id)}')"></span><button class="btn-small" onclick="editarVenta('${esc(v.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${esc(v.id)}')">🗑️</button></td>`;
 }
 
 export function calcularCostoFIFO(ref, cantidadNueva, fechaVenta) {
@@ -433,7 +433,7 @@ export function actualizarVentas() {
     const pintarTabla = (tbodyId, ventas, mensajeVacio) => {
         const tbody = document.getElementById(tbodyId);
         if(!tbody) return;
-        tbody.innerHTML = ventas.map(v => `<tr class="fila-venta${v.marcador === 'rojo' ? ' fila-rojo' : v.marcador === 'rosado' ? ' fila-rosado' : ''}" data-venta-id="${esc(v.id)}" onclick="APP.alternarMarcador('${esc(v.id)}');">${filaVentaHTML(v)}</tr>`).join('');
+        tbody.innerHTML = ventas.map(v => `<tr class="fila-venta ${v.marcador === 'rojo' ? 'fila-rojo' : v.marcador === 'rosado' ? 'fila-rosado' : ''}" data-venta-id="${esc(v.id)}">${filaVentaHTML(v)}</tr>`).join('');
         if(ventas.length === 0) tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: #999;">${mensajeVacio}</td></tr>`;
     };
 
@@ -450,22 +450,52 @@ export function actualizarVentas() {
     pintarTabla('tabla-ventas-cobro', cobroPendiente, 'No hay saldos pendientes por cobrar 🎉');
 }
 
-export function alternarMarcador(ventaId) {
-    const venta = APP.datos.ventas.find(v => v.id === ventaId);
-    if (!venta) return;
-
-    let nuevoValor = null;
-    if (!venta.marcador) {
-        nuevoValor = 'rojo';
-    } else if (venta.marcador === 'rojo') {
-        nuevoValor = 'rosado';
-    } else {
-        nuevoValor = null;
+export function abrirMenuMarcador(event, ventaId) {
+    const menuPrevio = document.getElementById('menu-marcador-flotante');
+    if (menuPrevio) {
+        menuPrevio.remove();
     }
 
-    venta.marcador = nuevoValor;
+    event.stopPropagation();
+
+    const menu = document.createElement('div');
+    menu.id = 'menu-marcador-flotante';
+    menu.className = 'menu-marcador abierto';
+    
+    menu.style.left = `${event.clientX}px`;
+    menu.style.top = `${event.clientY + 15}px`; 
+
+    menu.innerHTML = `
+        <div onclick="APP.seleccionarMarcador('${esc(ventaId)}', null)">Sin marcar</div>
+        <div onclick="APP.seleccionarMarcador('${esc(ventaId)}', 'rojo')">🔴 Pendiente</div>
+        <div onclick="APP.seleccionarMarcador('${esc(ventaId)}', 'rosado')">🔵 Inicio de semana</div>
+    `;
+
+    document.body.appendChild(menu);
+
+    const closeListener = (e) => {
+        if (!menu.contains(e.target) && e.target !== event.target) {
+            menu.remove();
+            document.removeEventListener('click', closeListener);
+        }
+    };
+    
+    setTimeout(() => {
+        document.addEventListener('click', closeListener);
+    }, 0);
+}
+
+export function seleccionarMarcador(ventaId, marcador) {
+    const venta = APP.datos.ventas.find(v => v.id === ventaId);
+    if(venta) {
+        venta.marcador = marcador;
+    }
+    
+    guardarMarcador(ventaId, marcador);
     actualizarVentas();
-    guardarMarcador(ventaId, nuevoValor);
+    
+    const menu = document.getElementById('menu-marcador-flotante');
+    if(menu) menu.remove();
 }
 
 export async function guardarMarcador(ventaId, marcador) {
