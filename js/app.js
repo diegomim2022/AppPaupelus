@@ -162,7 +162,11 @@ export const APP = {
     actualizarCompras() {
         const tabla = document.getElementById('tabla-compras');
         tabla.innerHTML = '';
-        const ordenadas = [...this.datos.compras].sort((a, b) => b.fecha.localeCompare(a.fecha));
+        const ordenadas = [...this.datos.compras].sort((a, b) => {
+            const diff = b.fecha.localeCompare(a.fecha);
+            if (diff !== 0) return diff;
+            return (Number(b.numero) || 0) - (Number(a.numero) || 0);
+        });
         ordenadas.forEach(c => {
             const prod = this.datos.productos.find(p => p.ref === c.ref);
             const nombreMostrar = c.nombre || (prod ? prod.nombre : '-');

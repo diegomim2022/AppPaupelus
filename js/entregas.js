@@ -9,7 +9,13 @@ export function actualizarEntregas() {
         const tabla = document.getElementById('tabla-entregas');
         if(!tabla) return;
         tabla.innerHTML = '';
-        const ordenadas = [...APP.datos.entregas].sort((a, b) => b.fecha.localeCompare(a.fecha));
+        const ordenadas = [...APP.datos.entregas].sort((a, b) => {
+            const diff = b.fecha.localeCompare(a.fecha);
+            if (diff !== 0) return diff;
+            const vA = APP.datos.ventas.find(v => v.id === a.venta_id);
+            const vB = APP.datos.ventas.find(v => v.id === b.venta_id);
+            return (Number(vB?.numero) || 0) - (Number(vA?.numero) || 0);
+        });
         ordenadas.forEach(e => {
             const dias = Math.floor((new Date() - parsearFechaLocal(e.fecha)) / (1000 * 60 * 60 * 24));
             const guiaAsignada = esGuiaValida(e.guia) ? e.guia : 'Sin asignar';

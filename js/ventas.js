@@ -437,7 +437,11 @@ export function actualizarVentas() {
         if(ventas.length === 0) tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; color: #999;">${mensajeVacio}</td></tr>`;
     };
 
-    const ordenadas = [...APP.datos.ventas].sort((a, b) => b.fecha.localeCompare(a.fecha));
+    const ordenadas = [...APP.datos.ventas].sort((a, b) => {
+        const diff = b.fecha.localeCompare(a.fecha);
+        if (diff !== 0) return diff;
+        return (Number(b.numero) || 0) - (Number(a.numero) || 0);
+    });
     pintarTabla('tabla-ventas', ordenadas, 'Sin ventas registradas');
 
     const envioPendiente = ordenadas.filter(v => {

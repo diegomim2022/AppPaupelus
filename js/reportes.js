@@ -46,9 +46,13 @@ export function actualizarDashboard() {
         const ultimas = document.getElementById('dash-ultimas');
         ultimas.innerHTML = '';
         const ops = [
-            ...APP.datos.compras.slice(0, 5).map(c => ({tipo: 'Compra', fecha: c.fecha, desc: c.ref, monto: c.costo_total})),
-            ...APP.datos.ventas.slice(0, 5).map(v => ({tipo: 'Venta', fecha: v.fecha, desc: itemsDeVenta(v).map(it => it.ref).join(', '), monto: v.total}))
-        ].sort((a, b) => parsearFechaLocal(b.fecha) - parsearFechaLocal(a.fecha)).slice(0, 10);
+            ...APP.datos.compras.slice(0, 5).map(c => ({tipo: 'Compra', fecha: c.fecha, desc: c.ref, monto: c.costo_total, numero: c.numero})),
+            ...APP.datos.ventas.slice(0, 5).map(v => ({tipo: 'Venta', fecha: v.fecha, desc: itemsDeVenta(v).map(it => it.ref).join(', '), monto: v.total, numero: v.numero}))
+        ].sort((a, b) => {
+            const diff = parsearFechaLocal(b.fecha) - parsearFechaLocal(a.fecha);
+            if (diff !== 0) return diff;
+            return (Number(b.numero) || 0) - (Number(a.numero) || 0);
+        }).slice(0, 10);
 
         ops.forEach(op => {
             const fila = document.createElement('tr');
@@ -272,7 +276,11 @@ export function generarReporteFechas() {
         const filtradas = APP.datos.ventas.filter(v => {
             const f = parsearFechaLocal(v.fecha);
             return f >= desde && f <= hasta;
-        }).sort((a, b) => parsearFechaLocal(a.fecha) - parsearFechaLocal(b.fecha));
+        }).sort((a, b) => {
+            const diff = parsearFechaLocal(b.fecha) - parsearFechaLocal(a.fecha);
+            if (diff !== 0) return diff;
+            return (Number(b.numero) || 0) - (Number(a.numero) || 0);
+        });
 
         const tbody = document.getElementById('tabla-reporte-fechas');
         tbody.innerHTML = '';
