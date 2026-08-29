@@ -53,9 +53,31 @@ create table ventas (
   saldo numeric not null default 0,
   utilidad numeric not null default 0,
   marcador text default null,
+  liquidacion_id uuid, -- referencia a liquidaciones (FK creada abajo)
   created_at timestamptz default now()
 );
 create index idx_ventas_fecha on ventas(fecha);
+
+create table liquidaciones (
+  id uuid primary key default gen_random_uuid(),
+  fecha_desde date not null,
+  fecha_hasta date not null,
+  total_ventas numeric not null default 0,
+  total_costo numeric not null default 0,
+  total_envios numeric not null default 0,
+  utilidad numeric not null default 0,
+  capital_paula numeric not null default 0,
+  capital_diego numeric not null default 0,
+  utilidad_paula numeric not null default 0,
+  utilidad_diego numeric not null default 0,
+  total_paula numeric not null default 0,
+  total_diego numeric not null default 0,
+  total_liquidado numeric not null default 0,
+  notas text default '',
+  created_at timestamptz default now()
+);
+
+alter table ventas add constraint fk_ventas_liquidacion foreign key (liquidacion_id) references liquidaciones(id) on delete set null;
 
 create table venta_items (
   id uuid primary key default gen_random_uuid(),
@@ -137,6 +159,7 @@ alter table ventas enable row level security;
 alter table venta_items enable row level security;
 alter table entregas enable row level security;
 alter table pagos enable row level security;
+alter table liquidaciones enable row level security;
 
 -- Reemplazamos las políticas viejas por unas que solo permiten a la
 -- dueña. El frontend usa siempre la anon key + login: si el usuario de
@@ -156,3 +179,4 @@ create policy "solo_duena" on public.ventas      for all to authenticated using 
 create policy "solo_duena" on public.venta_items for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
 create policy "solo_duena" on public.entregas    for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
 create policy "solo_duena" on public.pagos       for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());
+create policy "solo_duena" on public.liquidaciones for all to authenticated using (public.usuario_autorizado()) with check (public.usuario_autorizado());

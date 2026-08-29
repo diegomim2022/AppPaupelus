@@ -8,6 +8,7 @@ import { actualizarEntregas, abrirModalPago, ponerSaldoCompleto, guardarPagoModa
 import * as Inventario from './inventario.js';
 import * as Reportes from './reportes.js';
 import * as Datos from './datos.js';
+import * as Liquidaciones from './liquidaciones.js';
 
 let appIniciada = false;
 async function mostrarApp() {
@@ -79,7 +80,8 @@ export const APP = {
         clientes: [],
         compras: [],
         ventas: [],
-        entregas: []
+        entregas: [],
+        liquidaciones: []
     },
 
     // Dirty flag: indica que el inventario FIFO debe recalcularse.
@@ -135,7 +137,8 @@ export const APP = {
             'ventas': () => this.actualizarVentas(),
             'entregas': () => this.actualizarEntregas(),
             'inventario': () => this.actualizarInventario(),
-            'reportes': () => this.actualizarReportes()
+            'reportes': () => this.actualizarReportes(),
+            'liquidaciones': () => Liquidaciones.actualizarLiquidaciones()
         };
         if(mapa[id]) mapa[id]();
     },
@@ -203,6 +206,8 @@ export const APP = {
 
     async eliminarVenta(id) {
         if(!confirm('¿Eliminar venta?')) return;
+        const ventaEliminar = this.datos.ventas.find(v => String(v.id) === String(id));
+        if(ventaEliminar && ventaEliminar.liquidacion_id) { alert('Esta venta ya está liquidada y no se puede eliminar.'); return; }
         // Borrar la venta hace cascade en Supabase sobre venta_items y
         // entregas (y esta última sobre pagos) -- ver on delete cascade
         // en supabase_schema.sql.
@@ -281,6 +286,9 @@ window.esGuiaValida = esGuiaValida;
 APP.calcularInventario = Inventario.calcularInventario;
 APP.actualizarInventario = Inventario.actualizarInventario;
 window.exportarInventarioExcel = Inventario.exportarInventarioExcel;
+
+APP.calcularLiquidacion = Liquidaciones.calcularLiquidacion;
+APP.guardarLiquidacion = Liquidaciones.guardarLiquidacion;
 
 // Reportes/Dashboard
 APP.actualizarDashboard = Reportes.actualizarDashboard;

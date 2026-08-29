@@ -100,7 +100,9 @@ export function filaVentaHTML(v) {
         return `<strong>${esc(it.ref)}</strong>${nombre ? ' ' + esc(nombre) : ''} x${it.cantidad}`;
     }).join(', ');
     const clienteReal = v.cliente_id ? (v.cliente || v.cliente_nombre || '') : '';
-    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(clienteReal)}</td><td>${esc(normalizarCiudad(v.ciudad)) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td><span class="dot-marcador ${v.marcador === 'rojo' ? 'activo-rojo' : v.marcador === 'rosado' ? 'activo-rosado' : ''}" onclick="event.stopPropagation(); APP.abrirMenuMarcador(event, '${esc(v.id)}')"></span><button class="btn-small" onclick="editarVenta('${esc(v.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${esc(v.id)}')">🗑️</button></td>`;
+    const colorEstado = v.liquidacion_id ? '#2e7d5c' : '#888';
+    const estadoLiquidacion = `<span style="color:${colorEstado};font-weight:600;">${v.liquidacion_id ? '✅ Liquidada' : '⏳ Pendiente'}</span>`;
+    return `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td>${resumen}</td><td>$${v.total.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${costo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envio.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidad>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidad.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${esc(clienteReal)}</td><td>${esc(normalizarCiudad(v.ciudad)) || '-'}</td><td>$${v.abono.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${v.saldo.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>${estadoLiquidacion}</td><td><span class="dot-marcador ${v.marcador === 'rojo' ? 'activo-rojo' : v.marcador === 'rosado' ? 'activo-rosado' : ''}" onclick="event.stopPropagation(); APP.abrirMenuMarcador(event, '${esc(v.id)}')"></span><button class="btn-small" onclick="editarVenta('${esc(v.id)}')">✏️</button><button class="btn-small btn-delete" onclick="APP.eliminarVenta('${esc(v.id)}')">🗑️</button></td>`;
 }
 
 export function calcularCostoFIFO(ref, cantidadNueva, fechaVenta) {
@@ -418,6 +420,7 @@ export function editarVenta(id) {
     try {
         const v = APP.datos.ventas.find(x => x.id === id);
         if(!v) return;
+        if(v.liquidacion_id) { alert('Esta venta ya está liquidada y no se puede editar.'); return; }
         document.getElementById('vent-edit-id').value = id;
         document.getElementById('vent-fecha').value = v.fecha;
         const clienteInput = document.getElementById('vent-cliente');

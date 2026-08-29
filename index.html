@@ -43,6 +43,7 @@
                 <button class="nav-btn" data-section="entregas">🚚 Entregas</button>
                 <button class="nav-btn" data-section="inventario">📋 Inventario</button>
                 <button class="nav-btn" data-section="reportes">📈 Reportes</button>
+                <button class="nav-btn" data-section="liquidaciones">💸 Liquidaciones</button>
                 <button class="nav-btn" data-section="datos">💾 Datos</button>
                 <button type="button" onclick="cerrarSesion()" style="background:#e8b4c8; color:#7a3a56; border:none; border-radius:6px; padding:10px 15px; cursor:pointer; font-weight:600;">🚪 Salir</button>
             </nav>
@@ -359,7 +360,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Acciones</th>
+                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Estado</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ventas-envios"></tbody>
@@ -371,7 +372,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Acciones</th>
+                                <th>N°</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Costo</th><th>Envío</th><th>Utilidad</th><th>Cliente</th><th>Ciudad</th><th>Abono</th><th>Saldo</th><th>Estado</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ventas-cobro"></tbody>
@@ -395,6 +396,7 @@
                                 <th>Ciudad</th>
                                 <th>Abono</th>
                                 <th>Saldo</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -607,6 +609,87 @@
                         </tr>
                     </thead>
                     <tbody id="tabla-empresas">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- LIQUIDACIONES -->
+            <div id="liquidaciones" class="section">
+                <h2>💸 Liquidación de Utilidades</h2>
+                
+                <h3>1. Rango de Liquidación</h3>
+                <div class="form-row" style="align-items: flex-end;">
+                    <div class="form-group">
+                        <label>Desde Fecha:</label>
+                        <input type="date" id="liq-desde" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hasta Fecha:</label>
+                        <input type="date" id="liq-hasta" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn" onclick="APP.calcularLiquidacion()">Calcular Liquidación</button>
+                    </div>
+                </div>
+
+                <div id="liq-desglose-panel" style="display:none; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eecfdc; margin-top: 20px;">
+                    <h3 style="margin-top:0; color:#d6598c;">2. Desglose y Reparto</h3>
+                    <div id="liq-mensaje-error" style="color:red; font-weight:bold; margin-bottom:15px; display:none;"></div>
+                    <div class="grid" style="margin-bottom: 20px;">
+                        <div class="card">
+                            <h3>Total Ventas (V)</h3>
+                            <div class="value" id="liq-v">$0</div>
+                            <div class="label" id="liq-cant-ventas">0 ventas encontradas</div>
+                        </div>
+                        <div class="card">
+                            <h3>Costo Total (C)</h3>
+                            <div class="value" id="liq-c">$0</div>
+                            <div class="label">COGS (FIFO)</div>
+                        </div>
+                        <div class="card">
+                            <h3>Costo de Envíos (E)</h3>
+                            <div class="value" id="liq-e">$0</div>
+                            <div class="label">Pagado a transportadoras</div>
+                        </div>
+                        <div class="card">
+                            <h3>Utilidad del Período (U)</h3>
+                            <div class="value" id="liq-u" style="color: green;">$0</div>
+                            <div class="label">V - C - E</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="color:#d6598c; border-top: 1px solid #eee; padding-top: 15px;">Fórmula de Reparto: Paula (70% U) - Diego (30% U) - Capital (50/50 C)</h3>
+                    <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="card" style="background: #fdf5f8;">
+                            <h3>Paula Recibe</h3>
+                            <div class="value" id="liq-paula-total">$0</div>
+                            <div class="label" id="liq-paula-formula">Capital: $0 + Utilidad: $0</div>
+                        </div>
+                        <div class="card" style="background: #f5f8fd;">
+                            <h3>Diego Recibe</h3>
+                            <div class="value" id="liq-diego-total">$0</div>
+                            <div class="label" id="liq-diego-formula">Capital: $0 + Utilidad: $0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button type="button" class="btn" id="liq-guardar-btn" onclick="APP.guardarLiquidacion()" style="background:#d6598c;">💾 Guardar y Liquidar Ventas</button>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Historial de Liquidaciones Guardadas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha Registro</th>
+                            <th>Rango Liquidado</th>
+                            <th>Total Ventas</th>
+                            <th>Utilidad (U)</th>
+                            <th>Paula Recibe</th>
+                            <th>Diego Recibe</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-liquidaciones">
                     </tbody>
                 </table>
             </div>

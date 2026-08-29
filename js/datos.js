@@ -9,6 +9,7 @@ export function exportarJSON() {
             compras: APP.datos.compras,
             ventas: APP.datos.ventas,
             entregas: APP.datos.entregas,
+            liquidaciones: APP.datos.liquidaciones,
             fechaExportacion: new Date().toISOString()
         };
         const blob = new Blob([JSON.stringify(datos, null, 2)], {type: 'application/json'});
@@ -32,7 +33,7 @@ export async function limpiarTodo() {
         const NIL = '00000000-0000-0000-0000-000000000000';
         
         // Orden de borrado respetando las relaciones (hijos primero).
-        for(const tabla of ['pagos', 'entregas', 'venta_items', 'ventas', 'compras', 'productos', 'clientes']) {
+        for(const tabla of ['pagos', 'entregas', 'venta_items', 'ventas', 'liquidaciones', 'compras', 'productos', 'clientes']) {
             const { error } = await supabaseClient.from(tabla).delete().neq('id', NIL);
             if(error) { 
                 alert(`❌ Error al borrar "${tabla}": ` + error.message); 
@@ -47,6 +48,7 @@ export async function limpiarTodo() {
         APP.datos.compras = [];
         APP.datos.ventas = [];
         APP.datos.entregas = [];
+        APP.datos.liquidaciones = [];
         APP.actualizarTodo();
         actualizarEstadoDatos();
         
@@ -70,7 +72,7 @@ export function actualizarEstadoDatos() {
 
 export async function cargarDatos() {
     try {
-        const [rProd, rCli, rComp, rVent, rItems, rEnt, rPag] = await Promise.all([
+        const [rProd, rCli, rComp, rVent, rItems, rEnt, rPag, rLiq] = await Promise.all([
             supabaseClient.from('productos').select('*').order('created_at', { ascending: false }),
             supabaseClient.from('clientes').select('*').order('created_at', { ascending: false }),
             supabaseClient.from('compras').select('*').order('fecha', { ascending: false }),
@@ -78,8 +80,9 @@ export async function cargarDatos() {
             supabaseClient.from('venta_items').select('*'),
             supabaseClient.from('entregas').select('*').order('created_at', { ascending: false }),
             supabaseClient.from('pagos').select('*').order('created_at', { ascending: false }),
+            supabaseClient.from('liquidaciones').select('*').order('created_at', { ascending: false })
         ]);
-        const error = rProd.error || rCli.error || rComp.error || rVent.error || rItems.error || rEnt.error || rPag.error;
+        const error = rProd.error || rCli.error || rComp.error || rVent.error || rItems.error || rEnt.error || rPag.error || rLiq.error;
         if(error) throw error;
 
         const itemsPorVenta = {};
@@ -101,6 +104,7 @@ export async function cargarDatos() {
         this.datos.entregas = (rEnt.data || []).map(e => ({
             ...e, cliente: e.cliente_nombre, pagos: pagosPorEntrega[e.id] || []
         }));
+        this.datos.liquidaciones = rLiq.data || [];
         // Los datos cambiaron: el caché de inventario FIFO es inválido
         this.marcarInventarioSucio();
         return true;
