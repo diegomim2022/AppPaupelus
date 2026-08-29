@@ -52,6 +52,7 @@ create table ventas (
   abono numeric not null default 0,
   saldo numeric not null default 0,
   utilidad numeric not null default 0,
+  marcador text default null,
   created_at timestamptz default now()
 );
 create index idx_ventas_fecha on ventas(fecha);

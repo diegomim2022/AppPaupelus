@@ -27,9 +27,8 @@ INICIO RÁPIDO EN 3 PASOS:
 DATOS IMPORTANTES:
 
 ✅ ALMACENAMIENTO
-   - Todo se guarda en tu navegador (LocalStorage)
-   - No se envía a ningún servidor
-   - No necesitas internet para usar la app
+   - Todo se guarda en la nube (Supabase)
+   - Requiere internet y un inicio de sesión
    - Los datos se guardan automáticamente
 
 ✅ PORTABILIDAD
@@ -82,7 +81,7 @@ Margen = (Utilidad / Total Ventas) × 100%
 PREGUNTAS FRECUENTES:
 
 ❓ ¿Dónde se guardan mis datos?
-✅ En el navegador, en LocalStorage. Nunca en internet.
+✅ En la nube (Supabase), protegidos por tu cuenta y contraseña.
 
 ❓ ¿Qué pasa si borro el caché?
 ⚠️  Se pierden los datos. Respáldalos exportando.

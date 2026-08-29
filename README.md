@@ -1,6 +1,6 @@
 # 💖 Pau Pelus Beauty - Sistema de Gestión de Inventario
 
-Aplicación web local para gestionar inventario, compras y ventas de pelucas. **Funciona completamente offline** y almacena todos los datos en tu navegador.
+Aplicación web para gestionar inventario, compras y ventas de pelucas. Los datos se guardan en la nube (Supabase) y se accede mediante inicio de sesión.
 
 ## ✨ Características
 
@@ -10,7 +10,7 @@ Aplicación web local para gestionar inventario, compras y ventas de pelucas. **
 - **💰 Registro de Ventas** - Documenta cada venta con cliente, precio y información de envío
 - **📈 Reportes Detallados** - Análisis de inventario, proveedores y productos más vendidos
 - **💾 Backup & Exportación** - Descarga tus datos en JSON o CSV
-- **🌐 Completamente Offline** - Funciona sin internet, sin servidores, sin dependencias externas
+- **☁️ En la Nube (Supabase)** - Datos sincronizados y seguros con inicio de sesión
 
 ## 🚀 Cómo Usar
 
@@ -90,25 +90,25 @@ Respalda y migra tus datos:
 
 ## 💾 Almacenamiento de Datos
 
-Todos tus datos se guardan automáticamente en el **LocalStorage de tu navegador**:
-- No se envían a ningún servidor
-- No necesitas internet
-- Los datos persisten entre sesiones
-- Tienes 5 MB disponibles (más que suficiente para miles de registros)
+Todos tus datos se guardan en **Supabase** (base de datos en la nube):
+- Se accede con tu **correo y contraseña** (inicio de sesión)
+- **Se necesita internet** para usar la aplicación
+- Los datos persisten entre sesiones y dispositivos
+- Las políticas de seguridad (RLS) restringen el acceso solo a la dueña
 
 ## 🔒 Seguridad
 
-- ✅ Sin conexión a internet
-- ✅ Los datos nunca salen de tu computadora
-- ✅ No requiere usuario ni contraseña
-- ✅ Puedes ver y auditar todo el código (está en el HTML)
+- ✅ Inicio de sesión con correo y contraseña (Supabase Auth)
+- ✅ Acceso restringido por políticas RLS (solo la dueña lee/escribe)
+- ✅ La clave pública (anon key) es segura de exponer por diseño
+- ✅ Los scripts de migración usan la service key solo por variables de entorno, nunca en el código
 
-## 📱 Portabilidad
+## 📱 Despliegue
 
-La aplicación es **completamente portable**:
-1. Copia el archivo `index.html` a cualquier otro computador
-2. Abre en cualquier navegador web
-3. ¡Listo! Funciona en cualquier lugar
+La aplicación se sirve desde el repositorio (GitHub Pages u otro hosting estático):
+1. Sube el contenido de `D:\AppPaupelus` (index.html, css/, js/) a tu hosting
+2. Abre la URL en cualquier navegador
+3. Inicia sesión con tu cuenta de Supabase
 
 ## 🎓 Consejos de Uso
 

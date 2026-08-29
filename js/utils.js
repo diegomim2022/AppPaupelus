@@ -117,7 +117,7 @@ export function inicializarAutocomplete(inputId, listaId, onSelect) {
         ).slice(0, 8);
         if(coincidencias.length === 0) { ocultar(); return; }
         lista.innerHTML = coincidencias.map(p =>
-            `<div class="autocomplete-item" data-ref="${p.ref}" data-nombre="${(p.nombre || '').replace(/"/g, '&quot;')}"><strong>${p.ref}</strong><span class="ac-nombre">${p.nombre || ''}</span></div>`
+            `<div class="autocomplete-item" data-ref="${esc(p.ref)}" data-nombre="${esc(p.nombre || '')}"><strong>${esc(p.ref)}</strong><span class="ac-nombre">${esc(p.nombre || '')}</span></div>`
         ).join('');
         lista.style.display = 'block';
     };
@@ -162,7 +162,7 @@ export function inicializarAutocompleteCliente(inputId, listaId) {
         ).slice(0, 8);
         if(coincidencias.length === 0) { ocultar(); return; }
         lista.innerHTML = coincidencias.map(c =>
-            `<div class="autocomplete-item" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g, '&quot;')}"><strong>${c.nombre}</strong>${c.ciudad ? `<span class="ac-nombre">${c.ciudad}</span>` : ''}</div>`
+            `<div class="autocomplete-item" data-id="${esc(c.id)}" data-nombre="${esc(c.nombre)}"><strong>${esc(c.nombre)}</strong>${c.ciudad ? `<span class="ac-nombre">${esc(c.ciudad)}</span>` : ''}</div>`
         ).join('');
         lista.style.display = 'block';
     };
@@ -203,7 +203,7 @@ export function inicializarAutocompleteCiudad(inputId, listaId) {
         const ciudades = obtenerCiudadesUnicas();
         if(!q) {
             lista.innerHTML = ciudades.map(c =>
-                `<div class="autocomplete-item" data-ciudad="${c.replace(/"/g, '&quot;')}">${c}</div>`
+                `<div class="autocomplete-item" data-ciudad="${esc(c)}">${esc(c)}</div>`
             ).join('');
             lista.style.display = ciudades.length ? 'block' : 'none';
             return;
@@ -211,7 +211,7 @@ export function inicializarAutocompleteCiudad(inputId, listaId) {
         const coincidencias = ciudades.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
         if(coincidencias.length === 0) { ocultar(); return; }
         lista.innerHTML = coincidencias.map(c =>
-            `<div class="autocomplete-item" data-ciudad="${c.replace(/"/g, '&quot;')}">${c}</div>`
+            `<div class="autocomplete-item" data-ciudad="${esc(c)}">${esc(c)}</div>`
         ).join('');
         lista.style.display = 'block';
     };

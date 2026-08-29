@@ -310,7 +310,7 @@ export function generarReporteFechas() {
                 });
 
                 const fila = document.createElement('tr');
-                fila.innerHTML = `<td>${v.numero || '-'}</td><td>${formatearFecha(v.fecha)}</td><td><strong>${it.ref}</strong></td><td>${it.nombre || (prod ? prod.nombre : '-')}</td><td>${it.cantidad}</td><td>$${costoItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envioItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidadItem>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidadItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
+                fila.innerHTML = `<td>${esc(v.numero) || '-'}</td><td>${formatearFecha(v.fecha)}</td><td><strong>${esc(it.ref)}</strong></td><td>${esc(it.nombre || (prod ? prod.nombre : '-'))}</td><td>${esc(it.cantidad)}</td><td>$${costoItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${subtotal.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td>$${envioItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td style="color:${utilidadItem>=0?'#2e7d5c':'#c0575c'}; font-weight:600;">$${utilidadItem.toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>`;
                 tbody.appendChild(fila);
             });
         });
@@ -340,9 +340,15 @@ export function exportarReporteCSV() {
     try {
         const filas = _ultimoReporteFechas || [];
         if(filas.length === 0) { alert('Genera un reporte primero'); return; }
+        // Previene inyección de fórmulas (=, +, -, @) en Excel
+        const sanitizar = (val) => {
+            const s = String(val ?? '');
+            return /^[=+\-@]/.test(s) ? "'" + s : s;
+        };
         let csv = 'N Venta,Fecha,Referencia,Nombre,Cantidad,Costo,Venta,Costo Envio,Utilidad\n';
         filas.forEach(f => {
-            csv += `${f.numero || ''},${f.fecha},${f.ref},"${f.nombre || ''}",${f.cantidad},${f.costo},${f.venta},${f.envio},${f.utilidad}\n`;
+            const nombre = String(f.nombre ?? '').replace(/"/g, '""');
+            csv += `${sanitizar(f.numero) || ''},${f.fecha},${sanitizar(f.ref)},"${sanitizar(nombre)}",${f.cantidad},${f.costo},${f.venta},${f.envio},${f.utilidad}\n`;
         });
         const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
         const url = URL.createObjectURL(blob);

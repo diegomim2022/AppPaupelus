@@ -102,20 +102,42 @@ export async function guardarPagoModal(e) {
         if(monto <= 0) { alert('El monto debe ser mayor a 0'); return; }
         const entrega = APP.datos.entregas.find(x => x.id === entregaId);
         if(!entrega) { alert('No se encontró el envío'); return; }
+        if(monto > entrega.saldo) {
+            alert('El monto recibido (' + monto.toLocaleString('es-CO') + ') supera el saldo pendiente (' + entrega.saldo.toLocaleString('es-CO') + '). Revisa el valor e inténtalo de nuevo.');
+            return;
+        }
 
         const nuevoAbono = entrega.abono + monto;
-        const nuevoSaldo = Math.max(0, entrega.monto - nuevoAbono);
+        const nuevoSaldo = entrega.monto - nuevoAbono;
 
         const { data: pagoCreado, error: errPago } = await supabaseClient.from('pagos')
             .insert({ entrega_id: entregaId, fecha, monto, quien_paga: quien }).select();
         if(errPago) { alert('❌ Error al registrar el pago: ' + errPago.message); return; }
+        const pagoId = pagoCreado && pagoCreado[0] ? pagoCreado[0].id : null;
 
         const { error: errEnt } = await supabaseClient.from('entregas')
             .update({ abono: nuevoAbono, saldo: nuevoSaldo }).eq('id', entregaId);
-        if(errEnt) { alert('❌ Error al actualizar el envío: ' + errEnt.message); return; }
+        if(errEnt) {
+            if(pagoId) await supabaseClient.from('pagos').delete().eq('id', pagoId);
+            alert('❌ Error al actualizar el envío: ' + errEnt.message + ' El pago se revirtió.');
+            return;
+        }
 
         const venta = APP.datos.ventas.find(v => v.id === entrega.venta_id);
-        if(venta) { venta.abono = nuevoAbono; venta.saldo = nuevoSaldo; }
+        if(venta) {
+            const { error: errVenta } = await supabaseClient.from('ventas')
+                .update({ abono: nuevoAbono, saldo: nuevoSaldo }).eq('id', venta.id);
+            if(errVenta) {
+                // Rollback: revierte el pago y la entrega para no dejar estados a medias
+                if(pagoId) await supabaseClient.from('pagos').delete().eq('id', pagoId);
+                await supabaseClient.from('entregas')
+                    .update({ abono: entrega.abono, saldo: entrega.saldo }).eq('id', entregaId);
+                alert('❌ Error al actualizar la venta: ' + errVenta.message + ' El pago se revirtió.');
+                return;
+            }
+            venta.abono = nuevoAbono;
+            venta.saldo = nuevoSaldo;
+        }
 
         entrega.pagos.push(pagoCreado[0]);
         entrega.abono = nuevoAbono;

@@ -320,17 +320,39 @@ export async function agregarVenta(e) {
             const { error: errVenta } = await supabaseClient.from('ventas').update(cambiosVenta).eq('id', editId);
             if(errVenta) { alert('❌ Error al actualizar la venta: ' + errVenta.message); return; }
 
+            const entrega = APP.datos.entregas.find(x => x.venta_id === v.id);
+            const abonoAnterior = entrega ? entrega.abono : 0;
+
+            // Respaldar items actuales para poder revertir si falla el reemplazo
+            const itemsAnteriores = itemsDeVenta(v).map(({ id, ...rest }) => ({ ...rest, venta_id: editId }));
+
             const { error: errDel } = await supabaseClient.from('venta_items').delete().eq('venta_id', editId);
             if(errDel) { alert('❌ Error al actualizar los productos de la venta: ' + errDel.message); return; }
-            const { data: nuevosItems, error: errIns } = await supabaseClient.from('venta_items')
+            const { error: errIns } = await supabaseClient.from('venta_items')
                 .insert(itemsPayload.map(it => ({...it, venta_id: editId}))).select();
-            if(errIns) { alert('❌ Error al guardar los productos de la venta: ' + errIns.message); return; }
+            if(errIns) {
+                // Rollback: restaurar los items anteriores
+                await supabaseClient.from('venta_items').insert(itemsAnteriores).select();
+                alert('❌ Error al guardar los productos de la venta: ' + errIns.message + ' Se restauraron los productos anteriores.');
+                return;
+            }
 
-            const entrega = APP.datos.entregas.find(x => x.venta_id === v.id);
             if(entrega) {
                 const cambiosEntrega = { cliente_nombre: clienteNombre, fecha, monto: total, abono, saldo: Math.max(0, total - abono) };
                 const { error: errEnt } = await supabaseClient.from('entregas').update(cambiosEntrega).eq('id', entrega.id);
                 if(errEnt) { alert('❌ Error al actualizar el envío: ' + errEnt.message); return; }
+
+                // Reconciliar pagos si cambió el abono (mantener sum(pagos) === entrega.abono)
+                if(abono !== abonoAnterior) {
+                    const { error: errPagos } = await supabaseClient.from('pagos').delete().eq('entrega_id', entrega.id);
+                    if(errPagos) {
+                        alert('⚠️ La venta se guardó, pero no se pudieron sincronizar los pagos: ' + errPagos.message);
+                    } else if(abono > 0) {
+                        await supabaseClient.from('pagos').insert({
+                            entrega_id: entrega.id, fecha, monto: abono, quien_paga: 'Cliente'
+                        }).select();
+                    }
+                }
             }
             cancelarEdicionVenta();
             alert('✅ Venta actualizada');
@@ -343,21 +365,33 @@ export async function agregarVenta(e) {
             if(errVenta) { alert('❌ Error al registrar la venta: ' + errVenta.message); return; }
             const vent = ventaCreada[0];
 
-            const { data: itemsCreados, error: errItems } = await supabaseClient.from('venta_items')
+            const { error: errItems } = await supabaseClient.from('venta_items')
                 .insert(itemsPayload.map(it => ({...it, venta_id: vent.id}))).select();
-            if(errItems) { alert('❌ Error al guardar los productos de la venta: ' + errItems.message); return; }
+            if(errItems) {
+                await supabaseClient.from('ventas').delete().eq('id', vent.id); // rollback
+                alert('❌ Error al guardar los productos de la venta: ' + errItems.message + ' La venta se revirtió.');
+                return;
+            }
 
             const nuevaEntrega = {
                 venta_id: vent.id, guia: '', cliente_nombre: clienteNombre, fecha,
                 monto: total, abono, saldo: total - abono, empresa: 'Por definir'
             };
             const { data: entregaCreada, error: errEnt } = await supabaseClient.from('entregas').insert(nuevaEntrega).select();
-            if(errEnt) { alert('❌ Error al crear el envío: ' + errEnt.message); return; }
+            if(errEnt) {
+                await supabaseClient.from('venta_items').delete().eq('venta_id', vent.id); // rollback
+                await supabaseClient.from('ventas').delete().eq('id', vent.id);
+                alert('❌ Error al crear el envío: ' + errEnt.message + ' La venta se revirtió.');
+                return;
+            }
 
-            const { data: pagoCreado, error: errPago } = await supabaseClient.from('pagos').insert({
-                entrega_id: entregaCreada[0].id, fecha, monto: abono, quien_paga: 'Cliente'
-            }).select();
-            if(errPago) console.error(errPago);
+            // Solo registrar pago inicial si hay abono mayor a 0
+            if(abono > 0) {
+                const { error: errPago } = await supabaseClient.from('pagos').insert({
+                    entrega_id: entregaCreada[0].id, fecha, monto: abono, quien_paga: 'Cliente'
+                }).select();
+                if(errPago) alert('⚠️ La venta se guardó, pero no se pudo registrar el pago inicial: ' + errPago.message + ' Regístralo desde la sección Entregas.');
+            }
 
             carritoActual.length = 0;
             renderCarrito();
