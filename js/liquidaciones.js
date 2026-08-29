@@ -88,6 +88,7 @@ export function calcularLiquidacion() {
     document.getElementById('liq-diego-total').textContent = f(r.totalDiego);
     document.getElementById('liq-diego-formula').textContent = 'Capital: ' + f(r.capitalDiego) + ' + Utilidad: ' + f(r.utilidadDiego);
 
+    pintarListaVentas(r.ventas);
     if (panel) panel.style.display = 'block';
 }
 
@@ -154,6 +155,57 @@ export async function guardarLiquidacion() {
     }
 }
 
+// Lista los productos (ítems) de las ventas a liquidar, para verificar antes de guardar
+function pintarListaVentas(ventas) {
+    const cont = document.getElementById('liq-lista-ventas');
+    if (!cont) return;
+    if (ventas.length === 0) { cont.innerHTML = ''; return; }
+    let filas = '';
+    ventas.forEach(v => {
+        const items = (v.items && v.items.length) ? v.items : [{
+            ref: v.ref, nombre: v.nombre || '', cantidad: v.cantidad || 1, subtotal: v.total
+        }];
+        items.forEach(it => {
+            const prod = APP.datos.productos.find(p => p.ref === it.ref);
+            const nombre = it.nombre || (prod ? prod.nombre : '');
+            const subtotal = it.subtotal !== undefined ? it.subtotal : ((it.cantidad || 0) * (it.precio || 0));
+            filas += `<tr><td>#${esc(v.numero) || '-'}</td><td>${formatearFecha(v.fecha)}</td><td><strong>${esc(it.ref)}</strong></td><td>${esc(nombre)}</td><td>${it.cantidad}</td><td>$${Math.round(subtotal).toLocaleString('es-CO')}</td></tr>`;
+        });
+    });
+    cont.innerHTML = `<h3 style="color:#d6598c;">📦 Productos incluidos en esta liquidación (${ventas.length} ventas)</h3>
+        <table><thead><tr><th>N°</th><th>Fecha</th><th>Ref</th><th>Nombre</th><th>Cant</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody></table>`;
+}
+
+// Muestra en un modal los productos que se liquidaron en una liquidación guardada
+export function verDetalleLiquidacion(id) {
+    try {
+        const cont = document.getElementById('modal-liq-detalle-contenido');
+        if (!cont) return;
+        const ventas = APP.datos.ventas.filter(v => String(v.liquidacion_id) === String(id));
+        if (ventas.length === 0) {
+            cont.innerHTML = '<p style="color:#999;">No se encontraron ventas para esta liquidación.</p>';
+        } else {
+            let filas = '';
+            ventas.forEach(v => {
+                const items = (v.items && v.items.length) ? v.items : [{
+                    ref: v.ref, nombre: v.nombre || '', cantidad: v.cantidad || 1, subtotal: v.total
+                }];
+                items.forEach(it => {
+                    const prod = APP.datos.productos.find(p => p.ref === it.ref);
+                    const nombre = it.nombre || (prod ? prod.nombre : '');
+                    const subtotal = it.subtotal !== undefined ? it.subtotal : ((it.cantidad || 0) * (it.precio || 0));
+                    filas += `<tr><td>#${esc(v.numero) || '-'}</td><td>${formatearFecha(v.fecha)}</td><td><strong>${esc(it.ref)}</strong></td><td>${esc(nombre)}</td><td>${it.cantidad}</td><td>$${Math.round(subtotal).toLocaleString('es-CO')}</td></tr>`;
+                });
+            });
+            cont.innerHTML = `<table><thead><tr><th>N°</th><th>Fecha</th><th>Ref</th><th>Nombre</th><th>Cant</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody></table>`;
+        }
+        document.getElementById('modal-liq-detalle').style.display = 'flex';
+    } catch (e) {
+        console.error('Error en verDetalleLiquidacion:', e);
+        alert('Error al mostrar el detalle de la liquidación.');
+    }
+}
+
 export function actualizarLiquidaciones() {
     // Fechas por defecto: lunes de la semana actual → hoy
     const hoy = new Date();
@@ -195,6 +247,7 @@ export async function renderHistorialLiquidaciones() {
                 <td><strong style="color:green;">${f(l.utilidad)}</strong></td>
                 <td>${f(l.total_paula)}</td>
                 <td>${f(l.total_diego)}</td>
+                <td><button type="button" class="btn-small" onclick="APP.verDetalleLiquidacion('${esc(l.id)}')">📋 Ver</button></td>
             `;
             tabla.appendChild(fila);
         });

@@ -289,6 +289,7 @@ window.exportarInventarioExcel = Inventario.exportarInventarioExcel;
 
 APP.calcularLiquidacion = Liquidaciones.calcularLiquidacion;
 APP.guardarLiquidacion = Liquidaciones.guardarLiquidacion;
+APP.verDetalleLiquidacion = Liquidaciones.verDetalleLiquidacion;
 
 // Reportes/Dashboard
 APP.actualizarDashboard = Reportes.actualizarDashboard;

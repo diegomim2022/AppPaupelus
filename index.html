@@ -671,6 +671,8 @@
                             <div class="label" id="liq-diego-formula">Capital: $0 + Utilidad: $0</div>
                         </div>
                     </div>
+
+                    <div id="liq-lista-ventas" style="margin-top:20px;"></div>
                     
                     <div style="margin-top: 20px; text-align: right;">
                         <button type="button" class="btn" id="liq-guardar-btn" onclick="APP.guardarLiquidacion()" style="background:#d6598c;">💾 Guardar y Liquidar Ventas</button>
@@ -687,6 +689,7 @@
                             <th>Utilidad (U)</th>
                             <th>Paula Recibe</th>
                             <th>Diego Recibe</th>
+                            <th>Ver</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-liquidaciones">
@@ -767,6 +770,16 @@
                     <button type="button" class="btn" style="background:#aaa;" onclick="cerrarModal('modal-guia')">Cancelar</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal-fondo" id="modal-liq-detalle">
+        <div class="modal-caja" style="max-width:640px;">
+            <h3>📦 Productos liquidados</h3>
+            <div id="modal-liq-detalle-contenido" style="max-height:60vh; overflow-y:auto;"></div>
+            <div class="modal-acciones">
+                <button type="button" class="btn" style="background:#aaa;" onclick="cerrarModal('modal-liq-detalle')">Cerrar</button>
+            </div>
         </div>
     </div>
 
