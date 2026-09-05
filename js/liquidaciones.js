@@ -22,6 +22,13 @@ function ventasEnRango(desde, hasta) {
     });
 }
 
+function unidadesDeVenta(v) {
+    if (v.items && v.items.length) {
+        return v.items.reduce((s, it) => s + (Number(it.cantidad) || 0), 0);
+    }
+    return Number(v.cantidad) || 0;
+}
+
 // Calcula el desglose y las validaciones para un rango (devengo: total de cada venta)
 function calcular(desde, hasta) {
     const ventas = ventasEnRango(desde, hasta);
@@ -30,6 +37,7 @@ function calcular(desde, hasta) {
     const V = noLiquidadas.reduce((s, v) => s + (Number(v.total) || 0), 0);
     const C = noLiquidadas.reduce((s, v) => s + (Number(v.costo_total) || 0), 0);
     const E = noLiquidadas.reduce((s, v) => s + (Number(v.costo_envio) || 0), 0);
+    const unidades = noLiquidadas.reduce((s, v) => s + unidadesDeVenta(v), 0);
     const U = V - C - E;
 
     // NO redondear los intermedios: así capital y utilidad suman exacto
@@ -48,12 +56,7 @@ function calcular(desde, hasta) {
     if (!casi(totalPaula + totalDiego, V - E)) errores.push('El total repartido no coincide con V − E.');
     if (U < 0) errores.push('Utilidad negativa: esta semana no se puede liquidar.');
 
-    const superpuestas = (APP.datos.liquidaciones || []).filter(l => {
-        return desde <= l.fecha_hasta && hasta >= l.fecha_desde;
-    });
-    if (superpuestas.length > 0) errores.push('El rango se superpone con una liquidación ya guardada.');
-
-    return { desde, hasta, ventas: noLiquidadas, V, C, E, U, capitalPaula, capitalDiego, utilidadPaula, utilidadDiego, totalPaula, totalDiego, errores };
+    return { desde, hasta, ventas: noLiquidadas, V, C, E, U, unidades, capitalPaula, capitalDiego, utilidadPaula, utilidadDiego, totalPaula, totalDiego, errores };
 }
 
 export function calcularLiquidacion() {
@@ -79,7 +82,7 @@ export function calcularLiquidacion() {
 
     const f = (n) => '$' + Math.round(n).toLocaleString('es-CO');
     document.getElementById('liq-v').textContent = f(r.V);
-    document.getElementById('liq-cant-ventas').textContent = r.ventas.length + ' ventas encontradas';
+    document.getElementById('liq-cant-ventas').textContent = r.ventas.length + ' ventas · ' + r.unidades + ' unidades';
     document.getElementById('liq-c').textContent = f(r.C);
     document.getElementById('liq-e').textContent = f(r.E);
     document.getElementById('liq-u').textContent = f(r.U);
