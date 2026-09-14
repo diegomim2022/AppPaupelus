@@ -28,7 +28,7 @@ export function actualizarDashboard() {
         const cant_v = ventasMes.reduce((s, v) => s + itemsDeVenta(v).reduce((si, it) => si + (it.cantidad || 0), 0), 0);
         const utilidad = ventasMes.reduce((s, v) => s + (v.utilidad !== undefined ? v.utilidad : (v.total - (v.costo_total || 0) - (v.costo_envio || 0))), 0);
         const margen = ventas > 0 ? ((utilidad / ventas) * 100).toFixed(1) : 0;
-        const stock = cant_c - cant_v;
+        const stock = calcularInventario().reduce((s, f) => s + f.cantidad, 0);
         const recibido = entregasMes.reduce((sum, e) => sum + e.abono, 0);
         const total_ent = entregasMes.reduce((sum, e) => sum + e.monto, 0);
         const transito = total_ent - recibido;
