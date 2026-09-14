@@ -43,6 +43,22 @@ async function iniciarSesion(e) {
         errorEl.style.display = 'block';
         return false;
     }
+    let sesionConfirmada = false;
+    for (let intento = 0; intento < 3; intento++) {
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        if (sessionData && sessionData.session) {
+            sesionConfirmada = true;
+            break;
+        }
+        await new Promise(r => setTimeout(r, 150));
+    }
+
+    if (!sesionConfirmada) {
+        errorEl.textContent = 'Correo o contraseña incorrectos.';
+        errorEl.style.display = 'block';
+        return false;
+    }
+
     mostrarApp();
     return false;
 }
