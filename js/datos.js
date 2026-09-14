@@ -110,13 +110,17 @@ export async function cargarDatos() {
         return true;
     } catch(x) {
         console.error("Error en cargarDatos:", x);
-        const msg = x.message || String(x);
-        if(msg.includes('JWT') || msg.includes('token') || msg.includes('expired')) {
+        const rawMsg = x.message || String(x);
+        const msg = rawMsg.toLowerCase();
+        if(msg.includes('issued') || msg.includes('future') || msg.includes('iat')) {
             alert('⚠️ Tu sesión expiró o el reloj de este computador está desconfigurado.\n\nSolución:\n1. Ve a Configuración > Hora e idioma > Fecha y hora\n2. Activa "Establecer la hora automáticamente"\n3. Haz clic en "Sincronizar ahora"\n4. Recarga esta página');
             await supabaseClient.auth.signOut();
             location.reload();
+        } else if(msg.includes('jwt') || msg.includes('token') || msg.includes('expired') || msg.includes('session') || msg.includes('refresh_token')) {
+            await supabaseClient.auth.signOut();
+            location.reload();
         } else {
-            alert('⚠️ No se pudieron cargar los datos desde Supabase. Revisa tu conexión a internet y vuelve a intentar. (' + msg + ')');
+            alert('⚠️ No se pudieron cargar los datos desde Supabase. Revisa tu conexión a internet y vuelve a intentar. (' + rawMsg + ')');
         }
         return false;
     }

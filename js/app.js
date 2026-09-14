@@ -34,8 +34,8 @@ async function iniciarSesion(e) {
     btn.disabled = false;
     btn.textContent = 'Entrar';
     if(error) {
-        const emsg = error.message || '';
-        if(emsg.includes('JWT') || emsg.includes('token') || emsg.includes('clock')) {
+        const emsg = (error.message || '').toLowerCase();
+        if(emsg.includes('issued') || emsg.includes('future') || emsg.includes('iat')) {
             errorEl.textContent = 'El reloj de este computador está desconfigurado. Ve a Configuración > Hora e idioma y activa "Establecer la hora automáticamente", luego recarga la página.';
         } else {
             errorEl.textContent = 'Correo o contraseña incorrectos.';
